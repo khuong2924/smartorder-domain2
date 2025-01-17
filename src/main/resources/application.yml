@@ -1,0 +1,142 @@
+spring:
+  application:
+    name: smart-order-be-order-management-domain
+
+  # Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/smart_order_be_domain1
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 5
+      minimum-idle: 2
+      initialization-fail-timeout: 0
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      pool-name: OrderDomainHikariCP
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+  # SQL Init Configuration
+  sql:
+    init:
+      mode: never
+      schema-locations: classpath:backup.sql
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+#      password: ${REDIS_PASSWORD:}
+      timeout: 5000
+      connect-timeout: 5000
+      client-type: lettuce
+      database: 0
+      lettuce:
+        pool:
+          enabled: true
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+
+    cache:
+      type: redis
+      redis:
+        time-to-live: 86400000  # 24 hours in milliseconds
+        cache-null-values: false
+        key-prefix: smart_order_
+        use-key-prefix: true
+
+  # Kafka Configuration (n?u b?n c?n)
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+    consumer:
+      group-id: order-domain-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+# Server Configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /api/v1
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+    min-response-size: 1024
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.smartorder: DEBUG
+    org.springframework.data: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/order-domain.log
+    max-size: 10MB
+    max-history: 7
+
+# Management Endpoints (Actuator)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+# Custom Application Properties
+app:
+  order:
+    # C?u hình business logic cho order
+    max-items-per-order: 100
+    auto-cancel-after-minutes: 30
+    default-preparation-time: 15
+
+  menu:
+    # C?u hình business logic cho menu
+    cache-ttl-seconds: 3600
+    max-items-per-category: 50
+
+  billing:
+    # C?u hình business logic cho billing
+    tax-rate: 0.1
+    service-charge-rate: 0.05
+
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET:your-secret-key-here}
+      token-validity: 86400000 # 24 hours
