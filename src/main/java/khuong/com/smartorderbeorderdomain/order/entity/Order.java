@@ -2,20 +2,24 @@ package khuong.com.smartorderbeorderdomain.order.entity;
 
 import jakarta.persistence.*;
 import khuong.com.smartorderbeorderdomain.order.enums.OrderStatus;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Getter
-@Setter
-@EntityListeners(AuditingEntityListener.class)
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,22 +33,24 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items = new ArrayList<>();
 
-    private Long waiterId;
-    private Long customerId;
+    private BigDecimal totalAmount;
+    private BigDecimal tax;
+    private BigDecimal discount;
+    private BigDecimal finalAmount;
 
-    @CreatedDate
+    private Long createdBy;
     private LocalDateTime createdAt;
-
-    @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public void addItem(OrderItem item) {
-        items.add(item);
-        item.setOrder(this);
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        status = OrderStatus.NEW;
     }
 
-    public void removeItem(OrderItem item) {
-        items.remove(item);
-        item.setOrder(null);
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

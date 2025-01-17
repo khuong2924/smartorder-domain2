@@ -15,9 +15,11 @@ public class OrderDTO {
     private Integer tableNumber;
     private OrderStatus status;
     private List<OrderItemDTO> items;
-    private Long waiterId;
-    private Long customerId;
+    private BigDecimal totalAmount;
+    private BigDecimal tax;
+    private BigDecimal discount;
+    private BigDecimal finalAmount;
+    private Long createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private BigDecimal totalAmount;
 }
