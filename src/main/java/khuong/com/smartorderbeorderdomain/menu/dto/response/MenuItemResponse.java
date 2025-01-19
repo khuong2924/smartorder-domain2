@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.menu.dto;
+package khuong.com.smartorderbeorderdomain.menu.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

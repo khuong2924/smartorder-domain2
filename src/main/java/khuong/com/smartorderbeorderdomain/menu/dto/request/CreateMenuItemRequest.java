@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.menu.dto;
+package khuong.com.smartorderbeorderdomain.menu.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
