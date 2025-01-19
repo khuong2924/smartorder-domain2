@@ -1,7 +1,6 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
 
-import khuong.com.smartorderbeorderdomain.menu.dto.MenuItemDTO;
 import khuong.com.smartorderbeorderdomain.menu.payload.response.MenuUpdateMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

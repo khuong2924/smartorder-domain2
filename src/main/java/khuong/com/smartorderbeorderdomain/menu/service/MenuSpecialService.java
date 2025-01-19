@@ -2,7 +2,6 @@ package khuong.com.smartorderbeorderdomain.menu.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
-import khuong.com.smartorderbeorderdomain.menu.dto.MenuSpecialDTO;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuSpecialRepository;

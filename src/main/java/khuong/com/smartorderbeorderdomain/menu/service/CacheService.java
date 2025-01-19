@@ -1,7 +1,5 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
-import khuong.com.smartorderbeorderdomain.menu.dto.MenuCategoryDTO;
-import khuong.com.smartorderbeorderdomain.menu.dto.MenuItemDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
