@@ -1,6 +1,5 @@
 package khuong.com.smartorderbeorderdomain.menu.repository;
 
-import khuong.com.smartorderbeorderdomain.menu.entity.MenuSpecial;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

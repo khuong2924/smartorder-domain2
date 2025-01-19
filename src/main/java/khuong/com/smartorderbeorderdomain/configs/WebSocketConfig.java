@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.menu.configs;
+package khuong.com.smartorderbeorderdomain.configs;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

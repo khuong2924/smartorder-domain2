@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.menu.configs;
+package khuong.com.smartorderbeorderdomain.configs;
 
 import khuong.com.smartorderbeorderdomain.menu.service.CacheService;
 import lombok.RequiredArgsConstructor;

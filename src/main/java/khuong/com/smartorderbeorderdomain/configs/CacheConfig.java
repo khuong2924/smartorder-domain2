@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.menu.configs;
+package khuong.com.smartorderbeorderdomain.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;

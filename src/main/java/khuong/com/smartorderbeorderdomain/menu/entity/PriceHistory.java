@@ -1,19 +1,22 @@
 package khuong.com.smartorderbeorderdomain.menu.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "menu_item_price_history")
-@Getter
-@Setter
+@Table(name = "price_history")
+@Data
+@Builder
 @NoArgsConstructor
-public class MenuItemPriceHistory {
+@AllArgsConstructor
+public class PriceHistory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,17 +25,17 @@ public class MenuItemPriceHistory {
     @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 
-    @Column(nullable = false)
+    @Column(name = "old_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal oldPrice;
 
-    @Column(nullable = false)
+    @Column(name = "new_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal newPrice;
 
-    @Column(name = "changed_at", nullable = false)
-    private LocalDateTime changedAt;
+    private String reason;
 
     @Column(name = "changed_by")
-    private Long changedBy;
+    private String changedBy;
 
-    private String reason;
+    @Column(name = "changed_at")
+    private LocalDateTime changedAt;
 }

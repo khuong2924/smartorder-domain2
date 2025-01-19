@@ -2,10 +2,11 @@ package khuong.com.smartorderbeorderdomain.menu.entity;
 
 import jakarta.persistence.*;
 import khuong.com.smartorderbeorderdomain.menu.enums.ServingPeriod;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,41 +16,46 @@ import java.util.Set;
 
 @Entity
 @Table(name = "menu_items")
-@Getter @Setter
+@Data
+@Builder
 @NoArgsConstructor
-public class MenuItem {
+@AllArgsConstructor
+public class MenuItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    private MenuCategory category;
+    private Category category;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
     @Column(name = "preparation_time")
-    private Integer preparationTime; // in minutes
+    private Integer preparationTime;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    private boolean available = true;
-
-    @Column(name = "is_vegetarian")
     private boolean vegetarian;
-
-    @Column(name = "is_spicy")
     private boolean spicy;
-
-    @Column(name = "calories")
     private Integer calories;
+
+    @Column(name = "display_order")
+    private Integer displayOrder;
+
+    private boolean available = true;
+    private boolean active = true;
+
+    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
+    private List<MenuItemOption> options;
 
     @ElementCollection
     @CollectionTable(
@@ -57,40 +63,13 @@ public class MenuItem {
             joinColumns = @JoinColumn(name = "menu_item_id")
     )
     @Column(name = "allergen")
-    private Set<String> allergens = new HashSet<>();
+    private Set<String> allergens;
 
-    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MenuItemOption> options = new ArrayList<>();
-
-    @Column(name = "display_order")
-    private Integer displayOrder;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "serving_period")
-    private ServingPeriod servingPeriod;
-
-    private boolean active = true;
-
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @Column(name = "updated_by")
-    private Long updatedBy;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }

@@ -1,90 +1,127 @@
-package khuong.com.smartorderbeorderdomain.menu.service;
-
-import jakarta.transaction.Transactional;
-import khuong.com.smartorderbeorderdomain.menu.dto.MenuItemDTO;
-import khuong.com.smartorderbeorderdomain.menu.entity.MenuCategory;
-import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
-import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemOption;
-import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemPriceHistory;
-import khuong.com.smartorderbeorderdomain.menu.payload.request.CreateMenuItemRequest;
-import khuong.com.smartorderbeorderdomain.menu.payload.response.MenuItemDetailResponse;
-import khuong.com.smartorderbeorderdomain.menu.payload.response.MenuItemMessage;
-import khuong.com.smartorderbeorderdomain.menu.repository.MenuCategoryRepository;
-import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemPriceHistoryRepository;
-import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-@Service
-@RequiredArgsConstructor
-@Slf4j
-public class MenuItemService {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final String MENU_TOPIC = "menu-items";
-
-    public void sendMenuItemCreatedMessage(MenuItemDTO menuItem) {
-        MenuItemMessage message = new MenuItemMessage(
-                MenuEventType.ITEM_CREATED,
-                menuItem
-        );
-
-        kafkaTemplate.send(MENU_TOPIC, message)
-                .addCallback(
-                        result -> log.info("Menu item created message sent successfully"),
-                        ex -> log.error("Failed to send menu item created message", ex)
-                );
-    }
-
-    public void sendMenuItemUpdatedMessage(MenuItemDTO menuItem) {
-        MenuItemMessage message = new MenuItemMessage(
-                MenuEventType.ITEM_UPDATED,
-                menuItem
-        );
-
-        kafkaTemplate.send(MENU_TOPIC, message)
-                .addCallback(
-                        result -> log.info("Menu item updated message sent successfully"),
-                        ex -> log.error("Failed to send menu item updated message", ex)
-                );
-    }
-
-    public void sendAvailabilityChangedMessage(Long menuItemId, boolean available) {
-        MenuItemAvailabilityMessage message = new MenuItemAvailabilityMessage(
-                menuItemId,
-                available
-        );
-
-        kafkaTemplate.send(MENU_TOPIC, message)
-                .addCallback(
-                        result -> log.info("Availability changed message sent successfully"),
-                        ex -> log.error("Failed to send availability changed message", ex)
-                );
-    }
-
-    public void sendPriceChangedMessage(Long menuItemId, BigDecimal newPrice, BigDecimal oldPrice, String reason) {
-        MenuItemPriceMessage message = new MenuItemPriceMessage(
-                menuItemId,
-                newPrice,
-                oldPrice,
-                LocalDateTime.now(),
-                reason
-        );
-
-        kafkaTemplate.send(MENU_TOPIC, message)
-                .addCallback(
-                        result -> log.info("Price changed message sent successfully"),
-                        ex -> log.error("Failed to send price changed message", ex)
-                );
-    }
-}
+//package khuong.com.smartorderbeorderdomain.menu.service;
+//
+//
+//import khuong.com.smartorderbeorderdomain.menu.dto.MenuItemDTO;
+//import khuong.com.smartorderbeorderdomain.menu.entity.MenuCategory;
+//import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
+//import khuong.com.smartorderbeorderdomain.menu.repository.MenuCategoryRepository;
+//import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.apache.kafka.common.errors.ResourceNotFoundException;
+//import org.springframework.data.domain.Page;
+//import org.springframework.stereotype.Service;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.awt.print.Pageable;
+//
+//@Service
+//@RequiredArgsConstructor
+//@Slf4j
+//public class MenuItemService {
+//    private final MenuItemRepository menuItemRepository;
+//    private final MenuCategoryRepository categoryRepository;
+//    private final MenuItemMapper menuItemMapper;
+//    private final CacheService cacheService;
+//    private final WebSocketService webSocketService;
+//
+//    @Transactional(readOnly = true)
+//    public Page<MenuItemDTO> getAllMenuItems(Pageable pageable) {
+//        return menuItemRepository.findAll(pageable)
+//                .map(menuItemMapper::toDTO);
+//    }
+//
+//    @Transactional(readOnly = true)
+//    public MenuItemDTO getMenuItem(Long id) {
+//        return cacheService.getCachedMenuItem(id)
+//                .orElseGet(() -> {
+//                    MenuItemDTO dto = menuItemRepository.findById(id)
+//                            .map(menuItemMapper::toDTO)
+//                            .orElseThrow(() -> new ResourceNotFoundException("Menu item not found"));
+//                    cacheService.cacheMenuItem(dto);
+//                    return dto;
+//                });
+//    }
+//
+//    @Transactional
+//    public MenuItemDTO createMenuItem(CreateMenuItemRequest request) {
+//        MenuCategory category = categoryRepository.findById(request.getCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+//
+//        MenuItem menuItem = MenuItem.builder()
+//                .category(category)
+//                .name(request.getName())
+//                .description(request.getDescription())
+//                .price(request.getPrice())
+//                .preparationTime(request.getPreparationTime())
+//                .imageUrl(request.getImageUrl())
+//                .vegetarian(request.isVegetarian())
+//                .spicy(request.isSpicy())
+//                .calories(request.getCalories())
+//                .allergens(request.getAllergens())
+//                .displayOrder(request.getDisplayOrder())
+//                .available(true)
+//                .active(true)
+//                .build();
+//
+//        MenuItem savedItem = menuItemRepository.save(menuItem);
+//        MenuItemDTO dto = menuItemMapper.toDTO(savedItem);
+//
+//        cacheService.cacheMenuItem(dto);
+//        webSocketService.notifyMenuUpdate("ITEM_CREATED", dto);
+//
+//        return dto;
+//    }
+//
+//    @Transactional
+//    public MenuItemDTO updateMenuItem(Long id, UpdateMenuItemRequest request) {
+//        MenuItem menuItem = menuItemRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found"));
+//
+//        updateMenuItemFields(menuItem, request);
+//
+//        MenuItem updatedItem = menuItemRepository.save(menuItem);
+//        MenuItemDTO dto = menuItemMapper.toDTO(updatedItem);
+//
+//        cacheService.cacheMenuItem(dto);
+//        webSocketService.notifyMenuUpdate("ITEM_UPDATED", dto);
+//
+//        return dto;
+//    }
+//
+//    @Transactional
+//    public void deleteMenuItem(Long id) {
+//        MenuItem menuItem = menuItemRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found"));
+//
+//        menuItemRepository.delete(menuItem);
+//        cacheService.invalidateMenuItem(id);
+//        webSocketService.notifyMenuUpdate("ITEM_DELETED", menuItemMapper.toDTO(menuItem));
+//    }
+//
+//    @Transactional
+//    public void updateAvailability(Long id, boolean available) {
+//        MenuItem menuItem = menuItemRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found"));
+//
+//        menuItem.setAvailable(available);
+//        MenuItem updatedItem = menuItemRepository.save(menuItem);
+//
+//        MenuItemDTO dto = menuItemMapper.toDTO(updatedItem);
+//        cacheService.cacheMenuItem(dto);
+//        webSocketService.notifyAvailabilityChange(id, available);
+//    }
+//
+//    private void updateMenuItemFields(MenuItem menuItem, UpdateMenuItemRequest request) {
+//        if (request.getName() != null) {
+//            menuItem.setName(request.getName());
+//        }
+//        if (request.getDescription() != null) {
+//            menuItem.setDescription(request.getDescription());
+//        }
+//        if (request.getPrice() != null) {
+//            menuItem.setPrice(request.getPrice());
+//        }
+//        // ... update other fields
+//    }
+//}
