@@ -1,20 +1,20 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateMenuItemOptionRequest;
-import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateMenuItemOptionRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateOptionChoiceRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemOptionResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemOption;
 import khuong.com.smartorderbeorderdomain.menu.entity.OptionChoice;
-import khuong.com.smartorderbeorderdomain.menu.mapper.MenuMapper;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemOptionRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.OptionChoiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,19 +23,24 @@ import java.util.stream.Collectors;
 public class MenuItemOptionService {
     private final MenuItemOptionRepository optionRepository;
     private final OptionChoiceRepository choiceRepository;
-    private final MenuMapper menuMapper;
+    private final MenuItemService menuItemService;
 
     @Transactional
-    public List<MenuItemOption> createOptions(MenuItem menuItem,
-                                              List<CreateMenuItemOptionRequest> requests) {
-        return requests.stream()
-                .map(request -> createOption(menuItem, request))
-                .collect(Collectors.toList());
-    }
+    public MenuItemOptionResponse createOption(Long menuItemId, CreateMenuItemOptionRequest request) {
+        MenuItem menuItem = menuItemService.findMenuItemById(menuItemId);
 
-    @Transactional
-    public MenuItemOption createOption(MenuItem menuItem, CreateMenuItemOptionRequest request) {
-        MenuItemOption option = buildOption(menuItem, request);
+        MenuItemOption option = MenuItemOption.builder()
+                .menuItem(menuItem)
+                .name(request.getName())
+                .description(request.getDescription())
+                .additionalPrice(request.getAdditionalPrice())
+                .defaultOption(request.isDefaultOption())
+                .optionType(request.getOptionType())
+                .minSelections(request.getMinSelections())
+                .maxSelections(request.getMaxSelections())
+                .available(true)
+                .build();
+
         option = optionRepository.save(option);
 
         if (request.getChoices() != null) {
@@ -43,30 +48,31 @@ public class MenuItemOptionService {
             option.setChoices(choices);
         }
 
-        return option;
+        return MenuItemOptionResponse.fromEntity(option);
+    }
+
+    private List<OptionChoice> createChoices(MenuItemOption option, List<CreateOptionChoiceRequest> requests) {
+        return requests.stream()
+                .map(request -> OptionChoice.builder()
+                        .option(option)
+                        .name(request.getName())
+                        .description(request.getDescription())
+                        .additionalPrice(request.getAdditionalPrice())
+                        .available(true)
+                        .build())
+                .map(choiceRepository::save)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void updateOptions(MenuItem menuItem, List<UpdateMenuItemOptionRequest> requests) {
-        // Remove old options not in the update request
-        List<Long> updatedOptionIds = requests.stream()
-                .map(UpdateMenuItemOptionRequest::getId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        menuItem.getOptions().stream()
-                .filter(option -> !updatedOptionIds.contains(option.getId()))
-                .forEach(optionRepository::delete);
-
-        // Update existing and create new options
-        requests.forEach(request -> {
-            if (request.getId() != null) {
-                updateOption(request.getId(), request);
-            } else {
-                createOption(menuItem, menuMapper.toCreateRequest(request));
-            }
-        });
+    public void updateOptionAvailability(Long optionId, boolean available) {
+        MenuItemOption option = findOptionById(optionId);
+        option.setAvailable(available);
+        optionRepository.save(option);
     }
 
-    // ... other methods and helpers
+    private MenuItemOption findOptionById(Long id) {
+        return optionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Option not found with id: " + id));
+    }
 }

@@ -1,16 +1,18 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
-import jakarta.persistence.Cacheable;
-import khuong.com.smartorderbeorderdomain.menu.dto.response.CategoryResponse;
+import khuong.com.smartorderbeorderdomain.configs.CacheConstants;
+import khuong.com.smartorderbeorderdomain.menu.dto.exception.DuplicateResourceException;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateCategoryRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateCategoryRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.response.CategoryResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.Category;
-import khuong.com.smartorderbeorderdomain.menu.mapper.MenuMapper;
 import khuong.com.smartorderbeorderdomain.menu.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.DuplicateResourceException;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +24,26 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final MenuMapper menuMapper;
+    private final CacheManager cacheManager;
 
+    @Cacheable(cacheNames = CacheConstants.CATEGORY_CACHE, condition = "#id != null")
+    public CategoryResponse getCategoryById(Long id) {
+        log.info("Fetching category from database for id: {}", id);
+        return CategoryResponse.fromEntity(findCategoryById(id));
+    }
+
+    @Cacheable(cacheNames = CacheConstants.CATEGORY_CACHE, condition = "#root.methodName == 'getAllCategories'")
+    public List<CategoryResponse> getAllCategories() {
+        log.info("Fetching all active categories from database");
+        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc()
+                .stream()
+                .map(CategoryResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
-        log.info("Creating new category with name: {}", request.getName());
         validateCategoryName(request.getName());
 
         Category category = Category.builder()
@@ -36,46 +53,20 @@ public class CategoryService {
                 .active(true)
                 .build();
 
-        return menuMapper.toCategoryResponse(categoryRepository.save(category));
+        category = categoryRepository.save(category);
+        return CategoryResponse.fromEntity(category);
     }
 
+    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
     @Transactional
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
-        Category category = getCategoryEntity(id);
+        Category category = findCategoryById(id);
 
         if (request.getName() != null && !request.getName().equals(category.getName())) {
             validateCategoryName(request.getName());
             category.setName(request.getName());
         }
 
-        updateCategoryFields(category, request);
-        return menuMapper.toCategoryResponse(categoryRepository.save(category));
-    }
-
-    @Cacheable(value = "categories", key = "#id")
-    public CategoryResponse getCategoryById(Long id) {
-        return menuMapper.toCategoryResponse(getCategoryEntity(id));
-    }
-
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc()
-                .stream()
-                .map(menuMapper::toCategoryResponse)
-                .collect(Collectors.toList());
-    }
-
-    private Category getCategoryEntity(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
-    }
-
-    private void validateCategoryName(String name) {
-        if (categoryRepository.existsByNameIgnoreCase(name)) {
-            throw new DuplicateResourceException("Category name already exists");
-        }
-    }
-
-    private void updateCategoryFields(Category category, UpdateCategoryRequest request) {
         if (request.getDescription() != null) {
             category.setDescription(request.getDescription());
         }
@@ -84,6 +75,28 @@ public class CategoryService {
         }
         if (request.getActive() != null) {
             category.setActive(request.getActive());
+        }
+
+        category = categoryRepository.save(category);
+        return CategoryResponse.fromEntity(category);
+    }
+
+    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
+    @Transactional
+    public void deleteCategory(Long id) {
+        Category category = findCategoryById(id);
+        category.setActive(false);
+        categoryRepository.save(category);
+    }
+
+    private Category findCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+    }
+
+    private void validateCategoryName(String name) {
+        if (categoryRepository.existsByNameIgnoreCase(name)) {
+            throw new DuplicateResourceException("Category already exists with name: " + name);
         }
     }
 }
