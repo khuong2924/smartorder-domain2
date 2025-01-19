@@ -1,7 +1,7 @@
 package khuong.com.smartorderbeorderdomain.configs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.Caffeine;
+
+
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
@@ -10,14 +10,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
-import lombok.RequiredArgsConstructor;
-
-import java.time.Duration;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Configuration
 @EnableCaching

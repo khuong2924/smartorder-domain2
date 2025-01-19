@@ -2,31 +2,30 @@ package khuong.com.smartorderbeorderdomain.menu.repository;
 
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.awt.print.Pageable;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
 
+    Page<MenuItem> findByActiveAndAvailable(boolean active, boolean available, Pageable pageable);
+
     // Tìm món ăn theo category
     List<MenuItem> findByCategoryId(Long categoryId);
-
-    // Tìm món ăn đang active và available
-    Page<MenuItem> findByActiveAndAvailable(boolean active, boolean available, Pageable pageable);
 
     // Tìm kiếm món ăn theo tên hoặc mô tả
     @Query("SELECT m FROM MenuItem m WHERE " +
             "(LOWER(m.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(m.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
             "AND m.active = true")
-    List<MenuItem> searchMenuItems(String keyword);
+    List<MenuItem> searchMenuItems(@Param("keyword") String keyword);
 
     // Lấy danh sách món ăn theo nhiều category
     List<MenuItem> findByCategoryIdIn(List<Long> categoryIds);

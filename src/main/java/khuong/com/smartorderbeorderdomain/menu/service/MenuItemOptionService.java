@@ -9,6 +9,7 @@ import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemOptionRespon
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemOption;
 import khuong.com.smartorderbeorderdomain.menu.entity.OptionChoice;
+import khuong.com.smartorderbeorderdomain.menu.enums.OptionType;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemOptionRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.OptionChoiceRepository;
@@ -74,9 +75,9 @@ public class MenuItemOptionService {
 
         updateOptionFields(option, request);
 
-        if (request.getChoices() != null) {
-            updateChoices(option, request.getChoices());
-        }
+//        if (request.getChoices() != null) {
+//            updateChoices(option, request.getChoices());
+//        }
 
         option = optionRepository.save(option);
         return MenuItemOptionResponse.fromEntity(option);
@@ -229,7 +230,7 @@ public class MenuItemOptionService {
         if (request.getDescription() != null) option.setDescription(request.getDescription());
         if (request.getAdditionalPrice() != null) option.setAdditionalPrice(request.getAdditionalPrice());
         if (request.getDefaultOption() != null) option.setDefaultOption(request.getDefaultOption());
-        if (request.getOptionType() != null) option.setOptionType(request.getOptionType());
+        if (request.getOptionType() != null) option.setOptionType(OptionType.valueOf(request.getOptionType()));
         if (request.getMinSelections() != null) option.setMinSelections(request.getMinSelections());
         if (request.getMaxSelections() != null) option.setMaxSelections(request.getMaxSelections());
         if (request.getAvailable() != null) option.setAvailable(request.getAvailable());

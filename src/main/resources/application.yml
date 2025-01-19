@@ -44,7 +44,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-#      password: ${REDIS_PASSWORD:}
+      #      password: ${REDIS_PASSWORD:}
       timeout: 5000
       connect-timeout: 5000
       client-type: lettuce
@@ -57,16 +57,11 @@ spring:
           min-idle: 2
           max-wait: -1ms
 
-    cache:
-      type: caffeine
-      cache-names:
-        - categories
-        - menuItems
-        - options
-      caffeine:
-        spec: maximumSize=100,expireAfterWrite=60m
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=60m
 
-  # Kafka Configuration (n?u b?n c?n)
+  # Kafka Configuration (if needed)
   kafka:
     bootstrap-servers: localhost:9092
     producer:
@@ -122,18 +117,18 @@ management:
 # Custom Application Properties
 app:
   order:
-    # C?u h�nh business logic cho order
+    # Business logic configuration for order
     max-items-per-order: 100
     auto-cancel-after-minutes: 30
     default-preparation-time: 15
 
   menu:
-    # C?u h�nh business logic cho menu
+    # Business logic configuration for menu
     cache-ttl-seconds: 3600
     max-items-per-category: 50
 
   billing:
-    # C?u h�nh business logic cho billing
+    # Business logic configuration for billing
     tax-rate: 0.1
     service-charge-rate: 0.05
 

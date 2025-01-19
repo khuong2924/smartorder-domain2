@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MenuItemOptionRepository extends JpaRepository<MenuItemOption, Long> {
@@ -17,6 +18,8 @@ public interface MenuItemOptionRepository extends JpaRepository<MenuItemOption, 
 
     // Lấy danh sách option đang available
     List<MenuItemOption> findByMenuItemIdAndAvailableTrue(Long menuItemId);
+
+    Optional<MenuItemOption> findByIdAndMenuItemId(Long id, Long menuItemId);
 
     // Đếm số lượng option của món ăn
     long countByMenuItemId(Long menuItemId);

@@ -2,24 +2,32 @@ package khuong.com.smartorderbeorderdomain.menu.dto.request;
 
 
 
+import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateOptionChoiceRequest {
-
-    @NotNull(message = "Choice ID is required")
     private Long id;
 
-    @NotBlank(message = "Name is required")
-    @Size(max = 100, message = "Name must not exceed 100 characters")
+    @Size(max = 100, message = "Name cannot exceed 100 characters")
     private String name;
 
-    @Size(max = 500, message = "Description must not exceed 500 characters")
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
     private String description;
 
+    @DecimalMin(value = "0.0", message = "Additional price cannot be negative")
     private BigDecimal additionalPrice;
+
+    @Min(value = 0, message = "Display order cannot be negative")
+    private Integer displayOrder;
+
+    private Boolean available;
 }
