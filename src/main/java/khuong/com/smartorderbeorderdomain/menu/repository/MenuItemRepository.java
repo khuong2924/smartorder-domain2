@@ -1,27 +1,55 @@
 package khuong.com.smartorderbeorderdomain.menu.repository;
 
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
-import khuong.com.smartorderbeorderdomain.menu.enums.ServingPeriod;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.awt.print.Pageable;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
-    List<MenuItem> findByCategoryIdAndActiveTrue(Long categoryId);
-    List<MenuItem> findByAvailableTrueAndActiveTrue();
-    List<MenuItem> findByNameContainingIgnoreCaseAndActiveTrue(String name);
-    List<MenuItem> findByServingPeriodAndActiveTrue(ServingPeriod servingPeriod);
+
+    // Tìm món ăn theo category
+    List<MenuItem> findByCategoryId(Long categoryId);
+
+    // Tìm món ăn đang active và available
+    Page<MenuItem> findByActiveAndAvailable(boolean active, boolean available, Pageable pageable);
+
+    // Tìm kiếm món ăn theo tên hoặc mô tả
+    @Query("SELECT m FROM MenuItem m WHERE " +
+            "(LOWER(m.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(m.description) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND m.active = true")
+    List<MenuItem> searchMenuItems(String keyword);
+
+    // Lấy danh sách món ăn theo nhiều category
+    List<MenuItem> findByCategoryIdIn(List<Long> categoryIds);
+
+    // Lấy danh sách món chay
     List<MenuItem> findByVegetarianTrueAndActiveTrue();
 
-    @Query("SELECT mi FROM MenuItem mi WHERE mi.active = true AND mi.available = true " +
-            "AND mi.category.id = :categoryId ORDER BY mi.displayOrder")
-    List<MenuItem> findAvailableItemsByCategory(@Param("categoryId") Long categoryId);
+    // Lấy danh sách món cay
+    List<MenuItem> findBySpicyTrueAndActiveTrue();
 
-    @Query("SELECT DISTINCT mi FROM MenuItem mi JOIN mi.allergens a " +
-            "WHERE mi.active = true AND :allergen NOT MEMBER OF mi.allergens")
-    List<MenuItem> findByAllergenNotPresent(@Param("allergen") String allergen);
+    // Tìm món ăn theo khoảng giá
+    List<MenuItem> findByPriceBetweenAndActiveTrue(BigDecimal minPrice, BigDecimal maxPrice);
+
+    // Kiểm tra tên món ăn đã tồn tại chưa
+    boolean existsByNameIgnoreCaseAndCategoryId(String name, Long categoryId);
+
+    // Cập nhật trạng thái available
+    @Modifying
+    @Query("UPDATE MenuItem m SET m.available = :available WHERE m.id = :id")
+    void updateAvailability(@Param("id") Long id, @Param("available") boolean available);
+
+    // Cập nhật giá món ăn
+    @Modifying
+    @Query("UPDATE MenuItem m SET m.price = :newPrice WHERE m.id = :id")
+    void updatePrice(@Param("id") Long id, @Param("newPrice") BigDecimal newPrice);
 }
