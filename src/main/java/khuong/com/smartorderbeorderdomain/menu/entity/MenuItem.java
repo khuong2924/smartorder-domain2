@@ -1,7 +1,6 @@
 package khuong.com.smartorderbeorderdomain.menu.entity;
 
 import jakarta.persistence.*;
-import khuong.com.smartorderbeorderdomain.menu.enums.ServingPeriod;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
