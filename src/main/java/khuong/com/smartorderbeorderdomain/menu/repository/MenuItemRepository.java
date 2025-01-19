@@ -1,4 +1,5 @@
 package khuong.com.smartorderbeorderdomain.menu.repository;
+import org.springframework.data.domain.Pageable;
 
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import org.springframework.data.domain.Page;
