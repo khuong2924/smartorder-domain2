@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -22,5 +23,5 @@ public class CreateMenuItemOptionRequest {
     private OptionType optionType;
     private Integer minSelections;
     private Integer maxSelections;
-//    private List<CreateOptionChoiceRequest> choices;
+    private List<CreateOptionChoiceRequest> choices;
 }

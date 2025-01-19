@@ -1,6 +1,7 @@
 package khuong.com.smartorderbeorderdomain.menu.mapper;
 
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateMenuItemOptionRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateMenuItemOptionRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemOptionResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemOption;
 import org.mapstruct.*;

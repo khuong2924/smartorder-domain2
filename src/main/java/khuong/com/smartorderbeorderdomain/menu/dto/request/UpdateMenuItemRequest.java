@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -29,5 +30,5 @@ public class UpdateMenuItemRequest {
     private Integer displayOrder;
     private Boolean available;
     private Set<String> allergens;
-//    private List<UpdateMenuItemOptionRequest> options;
+    private List<UpdateMenuItemOptionRequest> options;
 }

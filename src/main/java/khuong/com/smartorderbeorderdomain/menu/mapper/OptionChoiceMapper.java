@@ -1,5 +1,8 @@
 package khuong.com.smartorderbeorderdomain.menu.mapper;
 
+import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateOptionChoiceRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateOptionChoiceRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.response.OptionChoiceResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.OptionChoice;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;

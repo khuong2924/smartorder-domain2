@@ -1,16 +1,23 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
+import jakarta.persistence.Cacheable;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateMenuItemRequest;
+import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateMenuItemRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.Category;
+import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
+import khuong.com.smartorderbeorderdomain.menu.mapper.MenuMapper;
 import khuong.com.smartorderbeorderdomain.menu.repository.CategoryRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.awt.print.Pageable;
 
 @Service
 @Slf4j
@@ -47,7 +54,7 @@ public class MenuItemService {
 
     @Transactional
     public MenuItemResponse updateMenuItem(Long id, UpdateMenuItemRequest request) {
-        MenuItem menuItem = getMenuItemEntity(id);
+        MenuItem menuItem = getMenuItemEntityById(id);
 
         if (request.getCategoryId() != null) {
             updateMenuItemCategory(menuItem, request.getCategoryId());
@@ -80,5 +87,5 @@ public class MenuItemService {
                 .map(menuMapper::toMenuItemResponse);
     }
 
-    // ... other methods and helpers
+
 }
