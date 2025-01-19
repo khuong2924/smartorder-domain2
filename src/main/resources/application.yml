@@ -61,15 +61,11 @@ spring:
     caffeine:
       spec: maximumSize=100,expireAfterWrite=60m
 
-  # Kafka Configuration (if needed)
+
   kafka:
     bootstrap-servers: localhost:9092
-    consumer:
-      group-id: my-group
-      auto-offset-reset: earliest
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    topic:
+      name: mykafka
 
 # Server Configuration
 server:

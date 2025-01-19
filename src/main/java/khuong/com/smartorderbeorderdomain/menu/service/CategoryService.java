@@ -10,6 +10,8 @@ import khuong.com.smartorderbeorderdomain.menu.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class CategoryService {
+    @Autowired
     private final CategoryRepository categoryRepository;
     private final CacheManager cacheManager;
 
@@ -32,13 +35,11 @@ public class CategoryService {
         return CategoryResponse.fromEntity(findCategoryById(id));
     }
 
-    @Cacheable(cacheNames = CacheConstants.CATEGORY_CACHE, condition = "#root.methodName == 'getAllCategories'")
-    public List<CategoryResponse> getAllCategories() {
-        log.info("Fetching all active categories from database");
-        return categoryRepository.findByActiveTrueOrderByDisplayOrderAsc()
-                .stream()
-                .map(CategoryResponse::fromEntity)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public List<Category> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        categories.forEach(category -> Hibernate.initialize(category.getMenuItems()));
+        return categories;
     }
 
     @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)

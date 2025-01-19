@@ -3,35 +3,34 @@ package khuong.com.smartorderbeorderdomain.configs.kafka;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Configuration
 public class KafkaTopicConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Value("${spring.kafka.topic.name}")
-    private String topicName;
-
     @Bean
     public AdminClient adminClient() {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        Map<String, Object> configs = Collections.singletonMap(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         return AdminClient.create(configs);
     }
 
     @Bean
-    public NewTopic createTopic() throws ExecutionException, InterruptedException {
-        NewTopic topic = new NewTopic(topicName, 1, (short) 1);
-        adminClient().createTopics(Collections.singletonList(topic)).all().get();
-        return topic;
+    public NewTopic createTopic(AdminClient adminClient) throws ExecutionException, InterruptedException {
+        String topicName = "mykafka";
+        if (!topicExists(adminClient, topicName)) {
+            return new NewTopic(topicName, 1, (short) 1);
+        } else {
+            return null; // Topic already exists, no need to create it
+        }
+    }
+
+    private boolean topicExists(AdminClient adminClient, String topicName) throws ExecutionException, InterruptedException {
+        return adminClient.listTopics().names().get().contains(topicName);
     }
 }

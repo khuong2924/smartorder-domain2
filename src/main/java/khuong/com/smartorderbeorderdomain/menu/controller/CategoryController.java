@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateCategoryRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateCategoryRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.response.CategoryResponse;
+import khuong.com.smartorderbeorderdomain.menu.entity.Category;
 import khuong.com.smartorderbeorderdomain.menu.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/categories")
@@ -41,7 +43,11 @@ public class CategoryController {
 
     @GetMapping
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+        List<Category> categories = categoryService.getAllCategories();
+        List<CategoryResponse> categoryResponses = categories.stream()
+                .map(CategoryResponse::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(categoryResponses);
     }
 
     @DeleteMapping("/{id}")
