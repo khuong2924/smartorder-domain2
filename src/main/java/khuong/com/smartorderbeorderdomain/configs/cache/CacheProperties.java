@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.configs;
+package khuong.com.smartorderbeorderdomain.configs.cache;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

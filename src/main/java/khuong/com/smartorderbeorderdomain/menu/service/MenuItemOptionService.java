@@ -1,6 +1,6 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
-import khuong.com.smartorderbeorderdomain.configs.CacheConstants;
+import khuong.com.smartorderbeorderdomain.configs.cache.CacheConstants;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateMenuItemOptionRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateOptionChoiceRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateMenuItemOptionRequest;

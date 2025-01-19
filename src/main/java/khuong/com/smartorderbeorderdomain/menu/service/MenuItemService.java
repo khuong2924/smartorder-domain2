@@ -3,7 +3,7 @@ package khuong.com.smartorderbeorderdomain.menu.service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
-import khuong.com.smartorderbeorderdomain.configs.CacheConstants;
+import khuong.com.smartorderbeorderdomain.configs.cache.CacheConstants;
 import khuong.com.smartorderbeorderdomain.menu.dto.exception.DuplicateResourceException;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateMenuItemRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateMenuItemRequest;

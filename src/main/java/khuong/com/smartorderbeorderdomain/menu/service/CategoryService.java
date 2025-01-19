@@ -1,6 +1,6 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
-import khuong.com.smartorderbeorderdomain.configs.CacheConstants;
+import khuong.com.smartorderbeorderdomain.configs.cache.CacheConstants;
 import khuong.com.smartorderbeorderdomain.menu.dto.exception.DuplicateResourceException;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.CreateCategoryRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.UpdateCategoryRequest;

@@ -1,4 +1,4 @@
-package khuong.com.smartorderbeorderdomain.configs;
+package khuong.com.smartorderbeorderdomain.configs.cache;
 
 public class CacheConstants {
     public static final String CATEGORY_CACHE = "categoryCache";
