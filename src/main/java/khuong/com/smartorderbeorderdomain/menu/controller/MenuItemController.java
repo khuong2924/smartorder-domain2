@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class MenuItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<MenuItemResponse> createMenuItem(
-            @Valid @RequestBody CreateMenuItemRequest request) {
+            @Valid @RequestBody CreateMenuItemRequest request) throws IOException {
         return ResponseEntity.ok(menuItemService.createMenuItem(request));
     }
 

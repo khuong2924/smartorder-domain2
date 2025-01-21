@@ -1,5 +1,7 @@
 package khuong.com.smartorderbeorderdomain.menu.service;
 
+import khuong.com.smartorderbeorderdomain.configs.cloudinary.ImageUploadService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,9 +33,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class MenuItemService {
+    @Autowired
     private final MenuItemRepository menuItemRepository;
+    @Autowired
     private final CategoryRepository categoryRepository;
     private final PriceHistoryService priceHistoryService;
+    @Autowired
+    private ImageUploadService imageUploadService;
 
 
     @Transactional
@@ -105,9 +112,38 @@ public class MenuItemService {
     }
 
 
+//    @CacheEvict(cacheNames = CacheConstants.MENU_ITEM_CACHE, allEntries = true)
+//    @Transactional
+//    public MenuItemResponse createMenuItem(CreateMenuItemRequest request) {
+//        Category category = categoryRepository.findById(request.getCategoryId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+//
+//        validateMenuItemName(request.getName(), request.getCategoryId());
+//
+//        MenuItem menuItem = MenuItem.builder()
+//                .category(category)
+//                .name(request.getName())
+//                .description(request.getDescription())
+//                .price(request.getPrice())
+//                .preparationTime(request.getPreparationTime())
+//                .imageUrl(request.getImageUrl())
+//                .vegetarian(request.isVegetarian())
+//                .spicy(request.isSpicy())
+//                .calories(request.getCalories())
+//                .allergens(request.getAllergens())
+//                .available(true)
+//                .active(true)
+//                .build();
+//
+//        menuItem = menuItemRepository.save(menuItem);
+//        priceHistoryService.saveInitialPrice(menuItem);
+//
+//        return MenuItemResponse.fromEntity(menuItem);
+//    }
+
     @CacheEvict(cacheNames = CacheConstants.MENU_ITEM_CACHE, allEntries = true)
     @Transactional
-    public MenuItemResponse createMenuItem(CreateMenuItemRequest request) {
+    public MenuItemResponse createMenuItem(CreateMenuItemRequest request) throws IOException, IOException {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
@@ -119,7 +155,6 @@ public class MenuItemService {
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .preparationTime(request.getPreparationTime())
-                .imageUrl(request.getImageUrl())
                 .vegetarian(request.isVegetarian())
                 .spicy(request.isSpicy())
                 .calories(request.getCalories())
@@ -128,9 +163,21 @@ public class MenuItemService {
                 .active(true)
                 .build();
 
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            String imageUrl = imageUploadService.uploadImage(request.getImage());
+            menuItem.setImageUrl(imageUrl);
+        } else {
+            menuItem.setImageUrl("https://www.svgrepo.com/show/508699/landscape-placeholder.svg");
+        }
+
         menuItem = menuItemRepository.save(menuItem);
         priceHistoryService.saveInitialPrice(menuItem);
 
         return MenuItemResponse.fromEntity(menuItem);
     }
+
+
+
+
+
 }

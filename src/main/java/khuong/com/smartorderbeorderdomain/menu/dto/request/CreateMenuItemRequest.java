@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,8 +35,8 @@ public class CreateMenuItemRequest {
     @Min(value = 0, message = "Preparation time cannot be negative")
     private Integer preparationTime;
 
-    @URL(message = "Invalid image URL format")
-    private String imageUrl;
+
+    private MultipartFile image;
 
     private boolean vegetarian;
     private boolean spicy;
