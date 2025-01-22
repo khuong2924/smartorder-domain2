@@ -14,11 +14,15 @@ import java.util.Map;
 public class ImageUploadService {
 
     @Autowired
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
+
+    public ImageUploadService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
 
     @SuppressWarnings("unchecked")
     public String uploadImage(MultipartFile file) throws IOException {
-        Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+        Map<String, Object> uploadResult =  cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
         return (String) uploadResult.get("url");
     }
 

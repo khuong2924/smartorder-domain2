@@ -1,4 +1,9 @@
 package khuong.com.smartorderbeorderdomain.menu.controller;
+import khuong.com.smartorderbeorderdomain.configs.cloudinary.ImageUploadService;
+import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
+import khuong.com.smartorderbeorderdomain.menu.repository.CategoryRepository;
+import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import
         org.springframework.data.domain.Pageable;
 import jakarta.validation.Valid;
@@ -19,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/menu-items")
@@ -26,32 +32,41 @@ import java.util.List;
 @Validated
 public class MenuItemController {
     private final MenuItemService menuItemService;
+    @Autowired
+    private final ImageUploadService imageUploadService;
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<MenuItemResponse> createMenuItem(
-            @Valid @RequestBody CreateMenuItemRequest request) throws IOException {
-        return ResponseEntity.ok(menuItemService.createMenuItem(request));
-    }
+    @Autowired
+    private MenuItemRepository menuItemRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-//    @PostMapping(consumes = "multipart/form-data")
+//    @PostMapping
+//    @ResponseStatus(HttpStatus.CREATED)
 //    public ResponseEntity<MenuItemResponse> createMenuItem(
-//            @RequestParam("name") String name,
-//            @RequestParam("description") String description,
-//            @RequestParam("price") BigDecimal price,
-//            @RequestParam("categoryId") Long categoryId,
-//            @RequestParam("preparationTime") int preparationTime,
-//            @RequestParam("vegetarian") boolean vegetarian,
-//            @RequestParam("spicy") boolean spicy,
-//            @RequestParam("calories") int calories,
-//            @RequestParam("allergens") Set<String> allergens,
-//            @RequestParam("image") MultipartFile image) throws IOException {
-//        // Create a request object and call the service
-//        CreateMenuItemRequest request = new CreateMenuItemRequest(name, description, price, categoryId, preparationTime, vegetarian, spicy, calories, allergens, image);
-//        MenuItemResponse response = menuItemService.createMenuItem(request);
-//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//            @Valid @RequestBody CreateMenuItemRequest request) throws IOException {
+//        return ResponseEntity.ok(menuItemService.createMenuItem(request));
 //    }
 
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<MenuItemResponse> createMenuItem(
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("price") BigDecimal price,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("preparationTime") int preparationTime,
+            @RequestParam("vegetarian") boolean vegetarian,
+            @RequestParam("spicy") boolean spicy,
+            @RequestParam("calories") int calories,
+            @RequestParam("allergens") Set<String> allergens,
+            @RequestParam("image") MultipartFile image) throws IOException {
+        // Create a request object
+        CreateMenuItemRequest request = new CreateMenuItemRequest(
+                categoryId, name, description, price, preparationTime, image, vegetarian, spicy, calories, allergens);
+
+        // Call the service method
+        MenuItemResponse response = menuItemService.createMenuItem(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 
 
     @PutMapping("/{id}")

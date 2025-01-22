@@ -25,7 +25,7 @@ public class PriceHistory implements Serializable {
     @JoinColumn(name = "menu_item_id", nullable = false)
     private MenuItem menuItem;
 
-    @Column(name = "old_price", nullable = false, precision = 10, scale = 2)
+    @Column(name = "old_price", precision = 10, scale = 2)
     private BigDecimal oldPrice;
 
     @Column(name = "new_price", nullable = false, precision = 10, scale = 2)
