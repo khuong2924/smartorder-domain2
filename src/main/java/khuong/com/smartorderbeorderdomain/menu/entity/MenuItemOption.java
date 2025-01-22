@@ -29,6 +29,8 @@ public class MenuItemOption implements Serializable {
     @Column(nullable = false, length = 100)
     private String name;
 
+    private BigDecimal price;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

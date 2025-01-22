@@ -72,15 +72,20 @@ public class MenuItemService {
         return MenuItemResponse.fromEntity(findMenuItemById(id));
     }
 
-    public Page<MenuItemResponse> getAllMenuItems(Pageable pageable) {
-        return menuItemRepository.findByActiveAndAvailable(true, true, pageable)
-                .map(MenuItemResponse::fromEntity);
-    }
+//    public Page<MenuItemResponse> getAllMenuItems(Pageable pageable) {
+//        return menuItemRepository.findByActiveAndAvailable(true, true, pageable)
+//                .map(MenuItemResponse::fromEntity);
+//    }
 
     public List<MenuItemResponse> searchMenuItems(String keyword) {
         return menuItemRepository.searchMenuItems(keyword).stream()
                 .map(MenuItemResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public Page<MenuItemResponse> getAllMenuItems(Pageable pageable) {
+        Page<MenuItem> menuItems = menuItemRepository.findAll(pageable);
+        return menuItems.map(MenuItemResponse::fromEntity);
     }
 
     @Transactional

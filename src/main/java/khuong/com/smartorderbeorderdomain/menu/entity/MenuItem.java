@@ -24,7 +24,7 @@ public class MenuItem implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -54,15 +54,15 @@ public class MenuItem implements Serializable {
     private boolean available = true;
     private boolean active = true;
 
-    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<MenuItemOption> options;
 
-    @ElementCollection
+//    @ElementCollection
     @CollectionTable(
             name = "menu_item_allergens",
             joinColumns = @JoinColumn(name = "menu_item_id")
     )
-    @Column(name = "allergen")
+    @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> allergens;
 
     @CreatedDate
