@@ -26,7 +26,7 @@ public class KafkaTopicConfig {
         if (!topicExists(adminClient, topicName)) {
             return new NewTopic(topicName, 1, (short) 1);
         } else {
-            return null; // Topic already exists, no need to create it
+            return null;
         }
     }
 

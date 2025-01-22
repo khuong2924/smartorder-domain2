@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
@@ -32,6 +33,26 @@ public class MenuItemController {
             @Valid @RequestBody CreateMenuItemRequest request) throws IOException {
         return ResponseEntity.ok(menuItemService.createMenuItem(request));
     }
+
+//    @PostMapping(consumes = "multipart/form-data")
+//    public ResponseEntity<MenuItemResponse> createMenuItem(
+//            @RequestParam("name") String name,
+//            @RequestParam("description") String description,
+//            @RequestParam("price") BigDecimal price,
+//            @RequestParam("categoryId") Long categoryId,
+//            @RequestParam("preparationTime") int preparationTime,
+//            @RequestParam("vegetarian") boolean vegetarian,
+//            @RequestParam("spicy") boolean spicy,
+//            @RequestParam("calories") int calories,
+//            @RequestParam("allergens") Set<String> allergens,
+//            @RequestParam("image") MultipartFile image) throws IOException {
+//        // Create a request object and call the service
+//        CreateMenuItemRequest request = new CreateMenuItemRequest(name, description, price, categoryId, preparationTime, vegetarian, spicy, calories, allergens, image);
+//        MenuItemResponse response = menuItemService.createMenuItem(request);
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
+
+
 
     @PutMapping("/{id}")
     public ResponseEntity<MenuItemResponse> updateMenuItem(

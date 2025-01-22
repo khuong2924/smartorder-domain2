@@ -47,6 +47,7 @@ public class MenuItem implements Serializable {
     private boolean spicy;
     private Integer calories;
 
+
     @Column(name = "display_order")
     private Integer displayOrder;
 

@@ -1,16 +1,13 @@
 package khuong.com.smartorderbeorderdomain.menu.dto.request;
 
-import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.URL;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -35,7 +32,6 @@ public class CreateMenuItemRequest {
     @Min(value = 0, message = "Preparation time cannot be negative")
     private Integer preparationTime;
 
-
     private MultipartFile image;
 
     private boolean vegetarian;
@@ -46,7 +42,4 @@ public class CreateMenuItemRequest {
 
     @Size(max = 10, message = "Cannot have more than 10 allergens")
     private Set<@NotBlank(message = "Allergen cannot be blank") String> allergens;
-
-    @Valid
-    private List<CreateMenuItemOptionRequest> options;
 }
