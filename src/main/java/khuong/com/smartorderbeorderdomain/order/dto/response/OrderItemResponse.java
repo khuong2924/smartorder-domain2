@@ -1,19 +1,33 @@
 package khuong.com.smartorderbeorderdomain.order.dto.response;
 
-import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemResponse;
-import khuong.com.smartorderbeorderdomain.order.enums.OrderItemStatus;
+import khuong.com.smartorderbeorderdomain.order.entity.OrderItem;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderItemResponse {
     private String id;
-    private MenuItemResponse menuItem;
+    private String menuItemId;
+    private String menuItemName;
     private Integer quantity;
     private BigDecimal unitPrice;
-    private OrderItemStatus status;
     private String specialNotes;
+
+    public static OrderItemResponse fromEntity(OrderItem orderItem) {
+        return OrderItemResponse.builder()
+                .id(orderItem.getId())
+                .menuItemId(String.valueOf(orderItem.getMenuItem().getId()))
+                .menuItemName(orderItem.getMenuItem().getName())
+                .quantity(orderItem.getQuantity())
+                .unitPrice(orderItem.getUnitPrice())
+                .specialNotes(orderItem.getSpecialNotes())
+                .build();
+    }
 }
