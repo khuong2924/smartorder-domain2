@@ -67,6 +67,8 @@ public class MenuItemService {
         return MenuItemResponse.fromEntity(menuItem);
     }
 
+
+
     @Cacheable(value = "menuItems", key = "#id")
     public MenuItemResponse getMenuItemById(Long id) {
         return MenuItemResponse.fromEntity(findMenuItemById(id));
@@ -76,6 +78,21 @@ public class MenuItemService {
 //        return menuItemRepository.findByActiveAndAvailable(true, true, pageable)
 //                .map(MenuItemResponse::fromEntity);
 //    }
+
+    public MenuItem toEntity(MenuItemResponse response) {
+        MenuItem menuItem = new MenuItem();
+        menuItem.setId(response.getId());
+        menuItem.setName(response.getName());
+        menuItem.setDescription(response.getDescription());
+        menuItem.setPrice(response.getPrice());
+        menuItem.setPreparationTime(response.getPreparationTime());
+        menuItem.setImageUrl(response.getImageUrl());
+        menuItem.setVegetarian(response.isVegetarian());
+        menuItem.setSpicy(response.isSpicy());
+        menuItem.setCalories(response.getCalories());
+        menuItem.setAllergens(response.getAllergens());
+        return menuItem;
+    }
 
     public List<MenuItemResponse> searchMenuItems(String keyword) {
         return menuItemRepository.searchMenuItems(keyword).stream()
@@ -181,9 +198,5 @@ public class MenuItemService {
 
         return MenuItemResponse.fromEntity(menuItem);
     }
-
-
-
-
 
 }

@@ -47,4 +47,19 @@ public class MenuItemResponse {
                         .collect(Collectors.toList()))
                 .build();
     }
+
+    public MenuItem toEntity(MenuItemResponse response) {
+        MenuItem menuItem = new MenuItem();
+        menuItem.setId(response.getId());
+        menuItem.setName(response.getName());
+        menuItem.setDescription(response.getDescription());
+        menuItem.setPrice(response.getPrice());
+        menuItem.setPreparationTime(response.getPreparationTime());
+        menuItem.setImageUrl(response.getImageUrl());
+        menuItem.setVegetarian(response.isVegetarian());
+        menuItem.setSpicy(response.isSpicy());
+        menuItem.setCalories(response.getCalories());
+        menuItem.setAllergens(response.getAllergens());
+        return menuItem;
+    }
 }

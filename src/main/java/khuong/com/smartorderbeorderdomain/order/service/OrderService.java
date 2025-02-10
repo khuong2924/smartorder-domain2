@@ -1,6 +1,7 @@
 // src/main/java/khuong/com/smartorderbeorderdomain/order/service/OrderService.java
 package khuong.com.smartorderbeorderdomain.order.service;
 
+import khuong.com.smartorderbeorderdomain.menu.dto.response.MenuItemResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItem;
 import khuong.com.smartorderbeorderdomain.menu.service.MenuItemService;
 import khuong.com.smartorderbeorderdomain.order.dto.exception.InvalidOrderStatusException;
@@ -10,6 +11,7 @@ import khuong.com.smartorderbeorderdomain.order.enums.OrderStatus;
 import khuong.com.smartorderbeorderdomain.order.repository.OrderItemRepository;
 import khuong.com.smartorderbeorderdomain.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import khuong.com.smartorderbeorderdomain.order.dto.request.CreateOrderRequest;
@@ -27,7 +29,9 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class OrderService {
+    @Autowired
     private final OrderRepository orderRepository;
+    @Autowired
     private final OrderItemRepository orderItemRepository;
     private final MenuItemService menuItemService;
     private final WebSocketService webSocketService;
@@ -67,12 +71,12 @@ public class OrderService {
     }
 
     private OrderItem createOrderItem(OrderItemRequest request, Order order) {
-        MenuItem menuItem = menuItemService.getMenuItem(request.getMenuItemId());
+        MenuItemResponse menuItem = menuItemService.getMenuItemById(Long.valueOf(request.getMenuItemId()));
 
         OrderItem orderItem = new OrderItem();
         orderItem.setId(UUID.randomUUID().toString());
         orderItem.setOrder(order);
-        orderItem.setMenuItem(menuItem);
+        orderItem.setMenuItem(menuItem.toEntity(menuItem));
         orderItem.setQuantity(request.getQuantity());
         orderItem.setUnitPrice(menuItem.getPrice());
         orderItem.setStatus(OrderItemStatus.PENDING);
