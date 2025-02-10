@@ -12,6 +12,7 @@ import khuong.com.smartorderbeorderdomain.order.repository.OrderItemRepository;
 import khuong.com.smartorderbeorderdomain.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import khuong.com.smartorderbeorderdomain.order.dto.request.CreateOrderRequest;
@@ -19,6 +20,7 @@ import khuong.com.smartorderbeorderdomain.order.dto.request.OrderItemRequest;
 import khuong.com.smartorderbeorderdomain.order.dto.response.OrderResponse;
 import khuong.com.smartorderbeorderdomain.order.entity.Order;
 import khuong.com.smartorderbeorderdomain.order.entity.OrderItem;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,12 +37,18 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final MenuItemService menuItemService;
     private final WebSocketService webSocketService;
+    @Autowired
+    private  RestTemplate restTemplate;
+
 
     public OrderResponse createOrder(CreateOrderRequest request) {
         Order order = new Order();
         order.setId(UUID.randomUUID().toString());
         order.setTableNumber(request.getTableNumber());
-        order.setWaiterId(request.getWaiterId());
+        String waiterId = getLoggedInUserId();
+        if (waiterId == null) {
+            throw new IllegalArgumentException("User is not logged in");
+        }
         order.setStatus(OrderStatus.PENDING);
         order.setNote(request.getNote());
 
@@ -55,6 +63,16 @@ public class OrderService {
         webSocketService.notifyKitchen(savedOrder);
 
         return OrderResponse.fromEntity(savedOrder);
+    }
+
+    private String getLoggedInUserId() {
+        String url = "http://localhost:8080/users/me";
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            // Assuming the response body contains the user ID
+            return response.getBody();
+        }
+        return null;
     }
 
     public OrderResponse updateOrderStatus(String orderId, OrderStatus newStatus) {

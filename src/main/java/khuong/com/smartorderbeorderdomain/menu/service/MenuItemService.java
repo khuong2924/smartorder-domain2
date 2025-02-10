@@ -69,7 +69,7 @@ public class MenuItemService {
 
 
 
-    @Cacheable(value = "menuItems", key = "#id")
+//    @Cacheable(value = "menuItems", key = "#id")
     public MenuItemResponse getMenuItemById(Long id) {
         return MenuItemResponse.fromEntity(findMenuItemById(id));
     }
