@@ -7,14 +7,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class MenuItemResponse {
     private Long id;
     private String name;
@@ -33,9 +36,10 @@ public class MenuItemResponse {
                 .price(menuItem.getPrice())
                 .preparationTime(menuItem.getPreparationTime())
                 .imageUrl(menuItem.getImageUrl())
-
                 .categoryName(menuItem.getCategory().getName())
-                .options(menuItem.getOptions().stream()
+                .options(Optional.ofNullable(menuItem.getOptions())
+                        .orElse(Collections.emptyList())
+                        .stream()
                         .map(MenuItemOptionResponse::fromEntity)
                         .collect(Collectors.toList()))
                 .build();

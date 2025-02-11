@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/menu-items")
+@RequestMapping("/menuItems")
 @RequiredArgsConstructor
 @Validated
 public class MenuItemController {
@@ -97,6 +97,12 @@ public class MenuItemController {
             @RequestParam boolean available) {
         menuItemService.updateMenuItemAvailability(id, available);
     }
+//    @GetMapping("/find-new")
+//    public ResponseEntity<List<MenuItemResponse>> findNewMenuItems(@RequestParam String keyword) {
+//        return ResponseEntity.ok(menuItemService.searchMenuItems(keyword));
+//
+//    }
+
 
 //    @GetMapping("/category/{categoryId}")
 //    public ResponseEntity<List<MenuItemResponse>> getMenuItemsByCategory(
