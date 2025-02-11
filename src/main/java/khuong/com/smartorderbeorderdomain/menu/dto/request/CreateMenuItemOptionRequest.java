@@ -26,10 +26,10 @@ public class CreateMenuItemOptionRequest {
     @DecimalMin(value = "0.0", message = "Additional price cannot be negative")
     private BigDecimal additionalPrice;
 
-    private boolean defaultOption;
-
-    @NotNull(message = "Option type is required")
-    private OptionType optionType;
+//    private boolean defaultOption;
+//
+//    @NotNull(message = "Option type is required")
+//    private OptionType optionType;
 
     @Min(value = 0, message = "Minimum selections cannot be negative")
     private Integer minSelections;

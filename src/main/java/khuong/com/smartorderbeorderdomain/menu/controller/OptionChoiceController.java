@@ -1,5 +1,6 @@
 package khuong.com.smartorderbeorderdomain.menu.controller;
 
+import jakarta.validation.Valid;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.OptionChoiceRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.response.OptionChoiceResponse;
 import khuong.com.smartorderbeorderdomain.menu.service.OptionChoiceService;
@@ -9,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/option-choices")
+@RequestMapping("/optionChoices")
 @RequiredArgsConstructor
 @Validated
 public class OptionChoiceController {

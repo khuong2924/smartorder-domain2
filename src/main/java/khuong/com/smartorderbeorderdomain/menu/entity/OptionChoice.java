@@ -2,10 +2,7 @@ package khuong.com.smartorderbeorderdomain.menu.entity;
 
 import jakarta.persistence.*;
 import khuong.com.smartorderbeorderdomain.menu.entity.MenuItemOption;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -16,6 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "option_choices")
 @Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

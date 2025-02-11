@@ -4,8 +4,10 @@ package khuong.com.smartorderbeorderdomain.menu.service;
 import khuong.com.smartorderbeorderdomain.menu.dto.request.OptionChoiceRequest;
 import khuong.com.smartorderbeorderdomain.menu.dto.response.OptionChoiceResponse;
 import khuong.com.smartorderbeorderdomain.menu.entity.OptionChoice;
+import khuong.com.smartorderbeorderdomain.menu.repository.MenuItemOptionRepository;
 import khuong.com.smartorderbeorderdomain.menu.repository.OptionChoiceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,15 +16,19 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OptionChoiceService {
-    private final OptionChoiceRepository optionChoiceRepository;
+    @Autowired
+    private OptionChoiceRepository optionChoiceRepository;
+    @Autowired
+    private MenuItemOptionRepository menuItemOptionRepository;
 
     public OptionChoiceResponse createOptionChoice(OptionChoiceRequest request) {
         OptionChoice optionChoice = new OptionChoice();
-        optionChoice.setMenuItemOptionId(request.getMenuItemOptionId());
+        optionChoice.setOption(menuItemOptionRepository.findById(request.getMenuItemOptionId())
+                .orElseThrow(() -> new RuntimeException("MenuItemOption not found")));
         optionChoice.setName(request.getName());
         optionChoice.setDescription(request.getDescription());
         optionChoice.setAdditionalPrice(request.getAdditionalPrice());
-        optionChoice.setDefaultChoice(request.isDefaultChoice());
+
         optionChoice.setAvailable(request.isAvailable());
         optionChoice.setDisplayOrder(request.getDisplayOrder());
 
@@ -34,11 +40,11 @@ public class OptionChoiceService {
         OptionChoice optionChoice = optionChoiceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("OptionChoice not found"));
 
-        optionChoice.setMenuItemOptionId(request.getMenuItemOptionId());
+        optionChoice.setOption(menuItemOptionRepository.findById(request.getMenuItemOptionId())
+                .orElseThrow(() -> new RuntimeException("MenuItemOption not found")));
         optionChoice.setName(request.getName());
         optionChoice.setDescription(request.getDescription());
         optionChoice.setAdditionalPrice(request.getAdditionalPrice());
-        optionChoice.setDefaultChoice(request.isDefaultChoice());
         optionChoice.setAvailable(request.isAvailable());
         optionChoice.setDisplayOrder(request.getDisplayOrder());
 
