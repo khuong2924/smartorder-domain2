@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
-    private String id;
+    private Long id;
     private String tableNumber;
     private String waiterId;
     private String status;

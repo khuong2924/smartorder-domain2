@@ -1,13 +1,10 @@
 package khuong.com.smartorderbeorderdomain.order.entity;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.CascadeType;
+
 import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,7 +15,8 @@ import java.time.LocalDateTime;
 @Setter
 public class Cart {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String tableNumber;
     private String customerId;
 

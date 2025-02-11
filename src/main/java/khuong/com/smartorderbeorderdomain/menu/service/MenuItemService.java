@@ -87,10 +87,6 @@ public class MenuItemService {
         menuItem.setPrice(response.getPrice());
         menuItem.setPreparationTime(response.getPreparationTime());
         menuItem.setImageUrl(response.getImageUrl());
-        menuItem.setVegetarian(response.isVegetarian());
-        menuItem.setSpicy(response.isSpicy());
-        menuItem.setCalories(response.getCalories());
-        menuItem.setAllergens(response.getAllergens());
         return menuItem;
     }
 
@@ -127,10 +123,6 @@ public class MenuItemService {
         if (request.getDescription() != null) menuItem.setDescription(request.getDescription());
         if (request.getPreparationTime() != null) menuItem.setPreparationTime(request.getPreparationTime());
         if (request.getImageUrl() != null) menuItem.setImageUrl(request.getImageUrl());
-        if (request.getVegetarian() != null) menuItem.setVegetarian(request.getVegetarian());
-        if (request.getSpicy() != null) menuItem.setSpicy(request.getSpicy());
-        if (request.getCalories() != null) menuItem.setCalories(request.getCalories());
-        if (request.getAllergens() != null) menuItem.setAllergens(request.getAllergens());
     }
 
 
@@ -178,10 +170,7 @@ public class MenuItemService {
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .preparationTime(request.getPreparationTime())
-                .vegetarian(request.isVegetarian())
-                .spicy(request.isSpicy())
-                .calories(request.getCalories())
-                .allergens(request.getAllergens())
+
                 .available(true)
                 .active(true)
                 .build();

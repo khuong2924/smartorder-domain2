@@ -54,14 +54,11 @@ public class MenuItemController {
             @RequestParam("price") BigDecimal price,
             @RequestParam("categoryId") Long categoryId,
             @RequestParam("preparationTime") int preparationTime,
-            @RequestParam("vegetarian") boolean vegetarian,
-            @RequestParam("spicy") boolean spicy,
-            @RequestParam("calories") int calories,
-            @RequestParam("allergens") Set<String> allergens,
+
             @RequestParam("image") MultipartFile image) throws IOException {
         // Create a request object
         CreateMenuItemRequest request = new CreateMenuItemRequest(
-                categoryId, name, description, price, preparationTime, image, vegetarian, spicy, calories, allergens);
+                categoryId, name, description, price, preparationTime, image);
 
         // Call the service method
         MenuItemResponse response = menuItemService.createMenuItem(request);

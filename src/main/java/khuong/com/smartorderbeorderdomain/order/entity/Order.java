@@ -21,7 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 public class Order {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String tableNumber;
     private String waiterId;

@@ -34,12 +34,4 @@ public class CreateMenuItemRequest {
 
     private MultipartFile image;
 
-    private boolean vegetarian;
-    private boolean spicy;
-
-    @Min(value = 0, message = "Calories cannot be negative")
-    private Integer calories;
-
-    @Size(max = 10, message = "Cannot have more than 10 allergens")
-    private Set<@NotBlank(message = "Allergen cannot be blank") String> allergens;
 }

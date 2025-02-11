@@ -8,6 +8,6 @@ import khuong.com.smartorderbeorderdomain.order.enums.OrderItemStatus;
 
 @Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, String> {
-    List<OrderItem> findByOrderId(String orderId);
+    List<OrderItem> findByOrderId(Long orderId);
     List<OrderItem> findByStatus(OrderItemStatus status);
 }

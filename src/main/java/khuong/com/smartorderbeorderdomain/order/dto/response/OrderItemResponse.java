@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderItemResponse {
-    private String id;
-    private String menuItemId;
+    private Long id;
+    private Long menuItemId;
     private String menuItemName;
     private Integer quantity;
     private BigDecimal unitPrice;
@@ -23,7 +23,7 @@ public class OrderItemResponse {
     public static OrderItemResponse fromEntity(OrderItem orderItem) {
         return OrderItemResponse.builder()
                 .id(orderItem.getId())
-                .menuItemId(String.valueOf(orderItem.getMenuItem().getId()))
+                .menuItemId(orderItem.getMenuItem().getId())
                 .menuItemName(orderItem.getMenuItem().getName())
                 .quantity(orderItem.getQuantity())
                 .unitPrice(orderItem.getUnitPrice())

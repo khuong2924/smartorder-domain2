@@ -27,8 +27,6 @@ public class Category {
     @Column(name = "display_order")
     private Integer displayOrder;
 
-    @Column(name = "image_url")
-    private String imageUrl;
 
     private boolean active = true;
 

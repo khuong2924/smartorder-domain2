@@ -22,10 +22,6 @@ public class MenuItemResponse {
     private BigDecimal price;
     private Integer preparationTime;
     private String imageUrl;
-    private boolean vegetarian;
-    private boolean spicy;
-    private Integer calories;
-    private Set<String> allergens;
     private String categoryName;
     private List<MenuItemOptionResponse> options;
 
@@ -37,10 +33,7 @@ public class MenuItemResponse {
                 .price(menuItem.getPrice())
                 .preparationTime(menuItem.getPreparationTime())
                 .imageUrl(menuItem.getImageUrl())
-                .vegetarian(menuItem.isVegetarian())
-                .spicy(menuItem.isSpicy())
-                .calories(menuItem.getCalories())
-                .allergens(menuItem.getAllergens())
+
                 .categoryName(menuItem.getCategory().getName())
                 .options(menuItem.getOptions().stream()
                         .map(MenuItemOptionResponse::fromEntity)
@@ -56,10 +49,7 @@ public class MenuItemResponse {
         menuItem.setPrice(response.getPrice());
         menuItem.setPreparationTime(response.getPreparationTime());
         menuItem.setImageUrl(response.getImageUrl());
-        menuItem.setVegetarian(response.isVegetarian());
-        menuItem.setSpicy(response.isSpicy());
-        menuItem.setCalories(response.getCalories());
-        menuItem.setAllergens(response.getAllergens());
+
         return menuItem;
     }
 }

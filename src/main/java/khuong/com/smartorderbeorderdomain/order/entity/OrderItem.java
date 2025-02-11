@@ -21,7 +21,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class OrderItem {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

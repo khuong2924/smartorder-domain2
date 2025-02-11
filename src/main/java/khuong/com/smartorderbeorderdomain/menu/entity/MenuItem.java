@@ -43,11 +43,6 @@ public class MenuItem implements Serializable {
     @Column(name = "image_url")
     private String imageUrl;
 
-    private boolean vegetarian;
-    private boolean spicy;
-    private Integer calories;
-
-
     @Column(name = "display_order")
     private Integer displayOrder;
 
@@ -57,13 +52,7 @@ public class MenuItem implements Serializable {
     @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<MenuItemOption> options;
 
-//    @ElementCollection
-    @CollectionTable(
-            name = "menu_item_allergens",
-            joinColumns = @JoinColumn(name = "menu_item_id")
-    )
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> allergens;
+
 
     @CreatedDate
     @Column(name = "created_at")

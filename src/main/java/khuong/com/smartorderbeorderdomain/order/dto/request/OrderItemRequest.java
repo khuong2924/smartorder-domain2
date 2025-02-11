@@ -6,7 +6,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class OrderItemRequest {
+    private String orderId;
     private String menuItemId;
-    private Integer quantity;
+    private int quantity;
+    private double unitPrice;
+    private String status;
     private String specialNotes;
 }

@@ -24,7 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -43,7 +43,6 @@ public class OrderService {
 
     public OrderResponse createOrder(CreateOrderRequest request) {
         Order order = new Order();
-        order.setId(UUID.randomUUID().toString());
         order.setTableNumber(request.getTableNumber());
         String waiterId = getLoggedInUserId();
         if (waiterId == null) {
@@ -92,7 +91,6 @@ public class OrderService {
         MenuItemResponse menuItem = menuItemService.getMenuItemById(Long.valueOf(request.getMenuItemId()));
 
         OrderItem orderItem = new OrderItem();
-        orderItem.setId(UUID.randomUUID().toString());
         orderItem.setOrder(order);
         orderItem.setMenuItem(menuItem.toEntity(menuItem));
         orderItem.setQuantity(request.getQuantity());

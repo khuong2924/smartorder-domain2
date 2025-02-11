@@ -34,16 +34,6 @@ public class UpdateMenuItemRequest {
     @URL(message = "Invalid image URL format")
     private String imageUrl;
 
-    private Boolean vegetarian;
-    private Boolean spicy;
-
-    @Min(value = 0, message = "Calories cannot be negative")
-    private Integer calories;
-
-    @Size(max = 10, message = "Cannot have more than 10 allergens")
-    private Set<@NotBlank(message = "Allergen cannot be blank") String> allergens;
-
-
     private Boolean available;
 
     @Valid

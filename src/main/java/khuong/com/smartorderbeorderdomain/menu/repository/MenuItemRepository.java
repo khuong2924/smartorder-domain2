@@ -28,14 +28,7 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
             "AND m.active = true")
     List<MenuItem> searchMenuItems(@Param("keyword") String keyword);
 
-    // Lấy danh sách món ăn theo nhiều category
-    List<MenuItem> findByCategoryIdIn(List<Long> categoryIds);
 
-    // Lấy danh sách món chay
-    List<MenuItem> findByVegetarianTrueAndActiveTrue();
-
-    // Lấy danh sách món cay
-    List<MenuItem> findBySpicyTrueAndActiveTrue();
 
     // Tìm món ăn theo khoảng giá
     List<MenuItem> findByPriceBetweenAndActiveTrue(BigDecimal minPrice, BigDecimal maxPrice);
