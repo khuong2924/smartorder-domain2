@@ -18,7 +18,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String tableNumber;
-    private String customerId;
+//    private String customerId;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
     private List<CartItem> items;
