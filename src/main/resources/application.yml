@@ -72,6 +72,7 @@ spring:
     topic:
       name: mykafka
 
+
 # Server Configuration
 server:
   port: 8081

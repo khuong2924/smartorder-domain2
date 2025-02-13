@@ -30,6 +30,22 @@ public class OrderItemService {
         return OrderItemResponse.fromEntity(orderItem);
     }
 
+//    public OrderItemResponse createOrderItem(OrderItemRequest request) {
+//        Order order = orderRepository.findById(request.getOrderId())
+//                .orElseThrow(() -> new RuntimeException("Order not found with id: " + request.getOrderId()));
+//
+//        OrderItem orderItem = new OrderItem();
+//        orderItem.setOrder(order);
+//        orderItem.setMenuItem(menuItemRepository.findById(Long.valueOf(request.getMenuItemId())).get());
+//        orderItem.setQuantity(request.getQuantity());
+//        orderItem.setUnitPrice(BigDecimal.valueOf(request.getUnitPrice()));
+//        orderItem.setStatus(OrderItemStatus.valueOf(request.getStatus()));
+//        orderItem.setSpecialNotes(request.getSpecialNotes());
+//
+//        orderItem = orderItemRepository.save(orderItem);
+//        return OrderItemResponse.fromEntity(orderItem);
+//    }
+
     public OrderItemResponse createOrderItem(OrderItemRequest request) {
         Order order = orderRepository.findById(request.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + request.getOrderId()));

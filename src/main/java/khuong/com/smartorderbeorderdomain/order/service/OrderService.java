@@ -44,10 +44,11 @@ public class OrderService {
     public OrderResponse createOrder(CreateOrderRequest request) {
         Order order = new Order();
         order.setTableNumber(request.getTableNumber());
-        String waiterId = getLoggedInUserId();
-        if (waiterId == null) {
-            throw new IllegalArgumentException("User is not logged in");
-        }
+        String waiterId = "1";
+//        String waiterId = getLoggedInUserId();
+//        if (waiterId == null) {
+//            throw new IllegalArgumentException("User is not logged in");
+//        }
         order.setStatus(OrderStatus.PENDING);
         order.setNote(request.getNote());
 
