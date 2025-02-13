@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>khuong.com</groupId>
-    <artifactId>smart-order-be-order-management-domain</artifactId>
+    <artifactId>smartorder-domain2</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>smart-order-be-order-management-domain</name>
     <description>smart-order-be-order-management-domain</description>
