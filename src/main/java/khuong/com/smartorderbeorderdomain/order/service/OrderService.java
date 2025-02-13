@@ -126,4 +126,16 @@ public class OrderService {
         }
         return false;
     }
+
+    public OrderResponse getOrderById(String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        return OrderResponse.fromEntity(order);
+    }
+    public List<OrderResponse> getAllOrder() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(OrderResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
 }

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/orderItems")
 @RequiredArgsConstructor
@@ -18,6 +20,12 @@ public class OrderItemController {
     public ResponseEntity<OrderItemResponse> getOrderItem(@PathVariable String id) {
         OrderItemResponse orderItemResponse = orderItemService.getOrderItem(id);
         return ResponseEntity.ok(orderItemResponse);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrderItemResponse>> getAllOrderItems() {
+        List<OrderItemResponse> orderItemResponses = orderItemService.getAllOrderItems();
+        return ResponseEntity.ok(orderItemResponses);
     }
 
     @PostMapping

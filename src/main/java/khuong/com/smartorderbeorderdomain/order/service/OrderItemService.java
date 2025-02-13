@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,13 @@ public class OrderItemService {
         OrderItem orderItem = orderItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order item not found with id: " + id));
         return OrderItemResponse.fromEntity(orderItem);
+    }
+
+    public List<OrderItemResponse> getAllOrderItems() {
+        List<OrderItem> orderItems = orderItemRepository.findAll();
+        return orderItems.stream()
+                .map(OrderItemResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
 //    public OrderItemResponse createOrderItem(OrderItemRequest request) {
