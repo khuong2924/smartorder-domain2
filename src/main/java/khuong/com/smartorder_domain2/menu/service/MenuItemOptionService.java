@@ -1,12 +1,12 @@
 package khuong.com.smartorder_domain2.menu.service;
 
-import khuong.com.smartorder_domain2.configs.cache.CacheConstants;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemOptionRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateOptionChoiceRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateMenuItemOptionRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateOptionChoiceRequest;
 import khuong.com.smartorder_domain2.menu.dto.response.MenuItemOptionResponse;
 import khuong.com.smartorder_domain2.menu.entity.MenuItem;
+import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
 import khuong.com.smartorder_domain2.menu.entity.MenuItemOption;
 import khuong.com.smartorder_domain2.menu.entity.OptionChoice;
 import khuong.com.smartorder_domain2.menu.enums.OptionType;
@@ -15,9 +15,8 @@ import khuong.com.smartorder_domain2.menu.repository.MenuItemRepository;
 import khuong.com.smartorder_domain2.menu.repository.OptionChoiceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,15 +82,13 @@ public class MenuItemOptionService {
         return MenuItemOptionResponse.fromEntity(option);
     }
 
-    @Cacheable(cacheNames = CacheConstants.MENU_OPTION_CACHE,
-            condition = "#menuItemId != null && #optionId != null")
+
     public MenuItemOptionResponse getOptionById(Long menuItemId, Long optionId) {
         return MenuItemOptionResponse.fromEntity(
                 findOptionByIdAndMenuItemId(optionId, menuItemId));
     }
 
-    @Cacheable(cacheNames = CacheConstants.MENU_OPTION_CACHE,
-            condition = "#menuItemId != null")
+
     public List<MenuItemOptionResponse> getOptionsByMenuItem(Long menuItemId) {
         findMenuItemById(menuItemId); // Validate menuItem exists
         return optionRepository.findByMenuItemId(menuItemId).stream()

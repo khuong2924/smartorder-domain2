@@ -4,10 +4,11 @@ spring:
 
   # Database Configuration
   datasource:
-    url: jdbc:mysql://localhost:3306/smart_order_be_domain1
-    username: root
+    url: jdbc:postgresql://localhost:5432/midterm-domain2
+    username: postgres
     password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
+
     hikari:
       connection-test-query: SELECT 1
       maximum-pool-size: 5
@@ -20,11 +21,11 @@ spring:
 
   # JPA Configuration
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
-    properties:
+    properties:      
       hibernate:
         format_sql: true
         jdbc:
@@ -37,47 +38,13 @@ spring:
   sql:
     init:
       mode: never
-      schema-locations: classpath:backup.sql
-
-  # Redis Configuration
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      #      password: ${REDIS_PASSWORD:}
-      timeout: 5000
-      connect-timeout: 5000
-      client-type: lettuce
-      database: 0
-      lettuce:
-        pool:
-          enabled: true
-          max-active: 8
-          max-idle: 8
-          min-idle: 2
-          max-wait: -1ms
-
-  cache:
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=60m
-
-
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: order-domain
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    topic:
-      name: mykafka
-
+      
 
 # Server Configuration
 server:
-  port: 8081
+  port: 8082
   servlet:
-    context-path:
+    context-path: /
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain
@@ -95,10 +62,6 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/order-domain.log
-    max-size: 10MB
-    max-history: 7
 
 # Management Endpoints (Actuator)
 management:
@@ -116,26 +79,15 @@ management:
 # Custom Application Properties
 app:
   order:
-    # Business logic configuration for order
     max-items-per-order: 100
     auto-cancel-after-minutes: 30
     default-preparation-time: 15
 
   menu:
-    # Business logic configuration for menu
     cache-ttl-seconds: 3600
     max-items-per-category: 50
 
   billing:
-    # Business logic configuration for billing
     tax-rate: 0.1
     service-charge-rate: 0.05
 
-  cache:
-    timeout-minutes: 60
-    max-size: 100
-
-  security:
-    jwt:
-      secret-key: ${JWT_SECRET:your-secret-key-here}
-      token-validity: 86400000 # 24 hours

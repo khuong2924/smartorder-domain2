@@ -19,7 +19,6 @@ import khuong.com.smartorder_domain2.order.dto.request.OrderItemRequest;
 import khuong.com.smartorder_domain2.order.dto.response.OrderResponse;
 import khuong.com.smartorder_domain2.order.entity.Order;
 import khuong.com.smartorder_domain2.order.entity.OrderItem;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -36,8 +35,6 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final MenuItemService menuItemService;
     private final WebSocketService webSocketService;
-    @Autowired
-    private  RestTemplate restTemplate;
 
 
     public OrderResponse createOrder(CreateOrderRequest request) {
@@ -64,15 +61,15 @@ public class OrderService {
         return OrderResponse.fromEntity(savedOrder);
     }
 
-    private String getLoggedInUserId() {
-        String url = "http://localhost:8080/users/me";
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            // Assuming the response body contains the user ID
-            return response.getBody();
-        }
-        return null;
-    }
+    // private String getLoggedInUserId() {
+    //     String url = "http://localhost:8080/users/me";
+    //     ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+    //     if (response.getStatusCode().is2xxSuccessful()) {
+    //         // Assuming the response body contains the user ID
+    //         return response.getBody();
+    //     }
+    //     return null;
+    // }
 
     public OrderResponse updateOrderStatus(String orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)

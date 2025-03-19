@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>khuong.com</groupId>
-    <artifactId>smartorder-domain2</artifactId>
+    <artifactId>domain2</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>smart-order-be-order-management-domain</name>
-    <description>smart-order-be-order-management-domain</description>
+    <name>domain2</name>
+    <description>domain2</description>
     <url/>
     <licenses>
         <license/>
@@ -35,10 +35,7 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
+    
 
 
 
@@ -49,12 +46,6 @@
             <version>1.5.5.Final</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <version>3.3.1</version>
-        </dependency>
 
 
         <dependency>
@@ -63,11 +54,7 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+     
 
         <!-- https://mvnrepository.com/artifact/com.cloudinary/cloudinary-http44 -->
         <dependency>
@@ -188,6 +175,10 @@
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
             <version>1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
 
 

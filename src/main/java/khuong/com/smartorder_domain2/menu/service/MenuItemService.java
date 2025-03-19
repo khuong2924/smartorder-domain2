@@ -3,9 +3,8 @@ package khuong.com.smartorder_domain2.menu.service;
 import khuong.com.smartorder_domain2.configs.cloudinary.ImageUploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.cache.annotation.CacheEvict;
-import khuong.com.smartorder_domain2.configs.cache.CacheConstants;
 import khuong.com.smartorder_domain2.menu.dto.exception.DuplicateResourceException;
+import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateMenuItemRequest;
 import khuong.com.smartorder_domain2.menu.dto.response.MenuItemResponse;
@@ -16,8 +15,6 @@ import khuong.com.smartorder_domain2.menu.repository.CategoryRepository;
 import khuong.com.smartorder_domain2.menu.repository.MenuItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.kafka.common.errors.ResourceNotFoundException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -119,11 +116,16 @@ public class MenuItemService {
     }
 
     private void updateMenuItemFields(MenuItem menuItem, UpdateMenuItemRequest request) {
-        if (request.getDescription() != null) menuItem.setDescription(request.getDescription());
-        if (request.getPreparationTime() != null) menuItem.setPreparationTime(request.getPreparationTime());
-        if (request.getImageUrl() != null) menuItem.setImageUrl(request.getImageUrl());
+        if (request.getDescription() != null) {
+            menuItem.setDescription(request.getDescription());
+        }
+        if (request.getPreparationTime() != null) {
+            menuItem.setPreparationTime(request.getPreparationTime());
+        }
+        if (request.getImageUrl() != null) {
+            menuItem.setImageUrl(request.getImageUrl());
+        }
     }
-
 
 
 //    @CacheEvict(cacheNames = CacheConstants.MENU_ITEM_CACHE, allEntries = true)
@@ -155,7 +157,7 @@ public class MenuItemService {
 //        return MenuItemResponse.fromEntity(menuItem);
 //    }
 
-    @CacheEvict(cacheNames = CacheConstants.MENU_ITEM_CACHE, allEntries = true)
+
     @Transactional
     public MenuItemResponse createMenuItem(CreateMenuItemRequest request) throws IOException, IOException {
         Category category = categoryRepository.findById(request.getCategoryId())

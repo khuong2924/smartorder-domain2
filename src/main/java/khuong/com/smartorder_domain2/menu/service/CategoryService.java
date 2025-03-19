@@ -1,20 +1,17 @@
 package khuong.com.smartorder_domain2.menu.service;
 
-import khuong.com.smartorder_domain2.configs.cache.CacheConstants;
 import khuong.com.smartorder_domain2.menu.dto.exception.DuplicateResourceException;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateCategoryRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateCategoryRequest;
 import khuong.com.smartorder_domain2.menu.dto.response.CategoryResponse;
 import khuong.com.smartorder_domain2.menu.entity.Category;
+import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
 import khuong.com.smartorder_domain2.menu.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +23,8 @@ import java.util.List;
 public class CategoryService {
     @Autowired
     private final CategoryRepository categoryRepository;
-    private final CacheManager cacheManager;
 
-    @Cacheable(cacheNames = CacheConstants.CATEGORY_CACHE, condition = "#id != null")
+
     public CategoryResponse getCategoryById(Long id) {
         log.info("Fetching category from database for id: {}", id);
         return CategoryResponse.fromEntity(findCategoryById(id));
@@ -41,7 +37,6 @@ public class CategoryService {
         return categories;
     }
 
-    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
     @Transactional
     public CategoryResponse createCategory(CreateCategoryRequest request) {
         validateCategoryName(request.getName());
@@ -57,7 +52,6 @@ public class CategoryService {
         return CategoryResponse.fromEntity(category);
     }
 
-    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
     @Transactional
     public CategoryResponse updateCategory(Long id, UpdateCategoryRequest request) {
         Category category = findCategoryById(id);
@@ -80,18 +74,17 @@ public class CategoryService {
         category = categoryRepository.save(category);
         return CategoryResponse.fromEntity(category);
     }
+    private Category findCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+    }
 
-    @CacheEvict(cacheNames = CacheConstants.CATEGORY_CACHE, allEntries = true)
+
     @Transactional
     public void deleteCategory(Long id) {
         Category category = findCategoryById(id);
         category.setActive(false);
         categoryRepository.save(category);
-    }
-
-    private Category findCategoryById(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
     }
 
     private void validateCategoryName(String name) {
