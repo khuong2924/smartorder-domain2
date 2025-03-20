@@ -4,7 +4,7 @@ spring:
 
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/midterm-domain2
+    url: jdbc:postgresql://localhost:5433/midterm-domain2
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver
@@ -13,7 +13,6 @@ spring:
       connection-test-query: SELECT 1
       maximum-pool-size: 5
       minimum-idle: 2
-      initialization-fail-timeout: 0
       connection-timeout: 20000
       idle-timeout: 300000
       max-lifetime: 1200000
@@ -34,11 +33,17 @@ spring:
         order_updates: true
     open-in-view: false
 
-  # SQL Init Configuration
-  sql:
-    init:
-      mode: never
-      
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+# JWT Configuration
+jwt:
+  secret: rSp/kisYeCdda6X8j0HA6jYCcpevXe6LQe3wHTPTC7GP5bQ5gqN15cLkAhtVomGpmT08rSqoyiD1wRxFOGhg8A==
+  expiration: 86400000
 
 # Server Configuration
 server:
@@ -50,19 +55,6 @@ server:
     mime-types: application/json,application/xml,text/html,text/plain
     min-response-size: 1024
 
-# Logging Configuration
-logging:
-  level:
-    root: INFO
-    com.smartorder: DEBUG
-    org.springframework.data: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-
 # Management Endpoints (Actuator)
 management:
   endpoints:
@@ -72,6 +64,14 @@ management:
   endpoint:
     health:
       show-details: always
+      group:
+        readiness:
+          include: db,diskSpace,ping
+  health:
+    redis:
+      enabled: false
+    db:
+      enabled: true
   metrics:
     tags:
       application: ${spring.application.name}
