@@ -1,6 +1,7 @@
 // src/main/java/khuong/com/smartorderbeorderdomain/order/service/OrderService.java
 package khuong.com.smartorder_domain2.order.service;
 
+import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
 import khuong.com.smartorder_domain2.menu.dto.response.MenuItemResponse;
 import khuong.com.smartorder_domain2.menu.service.MenuItemService;
 import khuong.com.smartorder_domain2.order.dto.exception.InvalidOrderStatusException;
@@ -9,6 +10,10 @@ import khuong.com.smartorder_domain2.order.enums.OrderItemStatus;
 import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.repository.OrderItemRepository;
 import khuong.com.smartorder_domain2.order.repository.OrderRepository;
+import khuong.com.smartorder_domain2.table.entity.Table;
+import khuong.com.smartorder_domain2.table.enums.TableStatus;
+import khuong.com.smartorder_domain2.table.repository.TableRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,16 +40,31 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final MenuItemService menuItemService;
     private final WebSocketService webSocketService;
-
-
+    @Autowired
+    private final TableRepository tableRepository;
+    
     public OrderResponse createOrder(CreateOrderRequest request) {
         Order order = new Order();
-        order.setTableNumber(request.getTableNumber());
+        
+        // Find table by id and update its status
+        Table table = tableRepository.findById(request.getTableId())
+                .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + request.getTableId()));
+        
+        if (table.getStatus() != TableStatus.AVAILABLE) {
+            throw new IllegalStateException("Table is not available");
+        }
+        
+        // Update table status to OCCUPIED
+        table.setStatus(TableStatus.OCCUPIED);
+        tableRepository.save(table);
+        
+        order.setTable(table);
         String waiterId = "1";
-//        String waiterId = getLoggedInUserId();
-//        if (waiterId == null) {
-//            throw new IllegalArgumentException("User is not logged in");
-//        }
+        // String waiterId = getLoggedInUserId();
+        // if (waiterId == null) {
+        //     throw new IllegalArgumentException("User is not logged in");
+        // }
+        order.setWaiterId(waiterId);
         order.setStatus(OrderStatus.PENDING);
         order.setNote(request.getNote());
 
@@ -133,5 +153,19 @@ public class OrderService {
         return orders.stream()
                 .map(OrderResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+    
+    // Add method to close table when order is completed
+    public void closeTable(Long orderId) {
+        Order order = orderRepository.findById(String.valueOf(orderId))
+                .orElseThrow(() -> new OrderNotFoundException(orderId.toString()));
+        
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CANCELLED) {
+            Table table = order.getTable();
+            table.setStatus(TableStatus.CLEANING);
+            tableRepository.save(table);
+        } else {
+            throw new InvalidOrderStatusException("Order must be completed or cancelled to close the table");
+        }
     }
 }

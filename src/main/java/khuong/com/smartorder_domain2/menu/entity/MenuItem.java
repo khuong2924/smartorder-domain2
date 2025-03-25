@@ -42,7 +42,7 @@ public class MenuItem implements Serializable {
 
     @Column(name = "display_order")
     private Integer displayOrder;
-
+    
     private boolean available = true;
     private boolean active = true;
 

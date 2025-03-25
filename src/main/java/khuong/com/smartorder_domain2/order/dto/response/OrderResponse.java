@@ -1,6 +1,7 @@
 package khuong.com.smartorder_domain2.order.dto.response;
 
 import khuong.com.smartorder_domain2.order.entity.Order;
+import khuong.com.smartorder_domain2.table.dto.response.TableResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class OrderResponse {
     private Long id;
-    private String tableNumber;
+    private TableResponse table;
     private String waiterId;
     private String status;
     private String note;
@@ -26,7 +27,7 @@ public class OrderResponse {
     public static OrderResponse fromEntity(Order order) {
         return OrderResponse.builder()
                 .id(order.getId())
-                .tableNumber(order.getTableNumber())
+                .table(TableResponse.fromEntity(order.getTable()))
                 .waiterId(order.getWaiterId())
                 .status(order.getStatus().name())
                 .note(order.getNote())

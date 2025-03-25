@@ -33,4 +33,10 @@ public class OrderController {
     public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrder();
     }
+    
+    @PostMapping("/{id}/close-table")
+    public ResponseEntity<Void> closeTable(@PathVariable Long id) {
+        orderService.closeTable(id);
+        return ResponseEntity.noContent().build();
+    }
 }

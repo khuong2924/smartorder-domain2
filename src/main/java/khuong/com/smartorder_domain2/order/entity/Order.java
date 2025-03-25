@@ -2,6 +2,7 @@ package khuong.com.smartorder_domain2.order.entity;
 
 import jakarta.persistence.*;
 import khuong.com.smartorder_domain2.order.enums.OrderStatus;
+import khuong.com.smartorder_domain2.table.entity.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
+@jakarta.persistence.Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,19 +24,23 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String tableNumber;
+    
+    // Thay thế tableNumber bằng liên kết với entity Table
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "table_id")
+    private khuong.com.smartorder_domain2.table.entity.Table table;
+    
     private String waiterId;
-
+    
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
+    
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> items;
-
+    
     private BigDecimal totalAmount;
     private String note;
-
+    
     @CreationTimestamp
     private LocalDateTime createdAt;
 

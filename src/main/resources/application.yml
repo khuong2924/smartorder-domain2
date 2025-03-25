@@ -4,13 +4,11 @@ spring:
 
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5433/midterm-domain2
+    url: jdbc:postgresql://db2:5432/midterm-domain2
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver
-
     hikari:
-      connection-test-query: SELECT 1
       maximum-pool-size: 5
       minimum-idle: 2
       connection-timeout: 20000
@@ -39,6 +37,12 @@ spring:
     port: 5672
     username: guest
     password: guest
+    
+  # Disable Redis auto-configuration
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 # JWT Configuration
 jwt:
@@ -49,7 +53,8 @@ jwt:
 server:
   port: 8082
   servlet:
-    context-path: /
+    context-path: /domain2
+  forward-headers-strategy: framework
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/plain
