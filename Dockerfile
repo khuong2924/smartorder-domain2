@@ -11,10 +11,19 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 RUN apt-get update && apt-get install -y curl
 
-# Không ghi đè application.yml, sử dụng biến môi trường để cấu hình
-ENV JWT_SECRET=8K9sJ2mPqX7vL4rT5nY8uW3iB6oZ9cA1dF4gH7jK
-ENV JWT_EXPIRATION=86400000
-ENV SERVER_FORWARD_HEADERS_STRATEGY=framework
+# Sử dụng ARG để nhận giá trị từ docker-compose
+ARG JWT_SECRET
+ARG JWT_EXPIRATION=86400000
+ARG SERVER_FORWARD_HEADERS_STRATEGY=framework
+
+ENV JWT_SECRET=${JWT_SECRET}
+ENV JWT_EXPIRATION=${JWT_EXPIRATION}
+ENV SERVER_FORWARD_HEADERS_STRATEGY=${SERVER_FORWARD_HEADERS_STRATEGY}
+ENV TZ=Asia/Ho_Chi_Minh
+
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8082/domain2/actuator/health || exit 1
 
 EXPOSE 8082
 ENTRYPOINT ["java", "-jar", "app.jar"]

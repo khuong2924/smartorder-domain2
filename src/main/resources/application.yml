@@ -1,12 +1,12 @@
 spring:
   application:
-    name: smart-order-be-order-management-domain
+    name: domain2
 
   # Database Configuration
   datasource:
-    url: jdbc:postgresql://db2:5432/midterm-domain2
-    username: postgres
-    password: 123456
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:midterm-domain2}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:123456}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 5
@@ -18,7 +18,6 @@ spring:
 
   # JPA Configuration
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -29,14 +28,15 @@ spring:
           batch_size: 50
         order_inserts: true
         order_updates: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
   # RabbitMQ Configuration
   rabbitmq:
-    host: rabbitmq
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
     
   # Disable Redis auto-configuration
   autoconfigure:
@@ -48,8 +48,8 @@ spring:
 # Sửa từ jwt.secret thành app.jwt.secret cho phù hợp với mã Java
 app:
   jwt:
-    secret: rSp/kisYeCdda6X8j0HA6jYCcpevXe6LQe3wHTPTC7GP5bQ5gqN15cLkAhtVomGpmT08rSqoyiD1wRxFOGhg8A==
-    expiration: 86400000
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
     
   # Các thuộc tính ứng dụng khác
   order:
@@ -58,7 +58,7 @@ app:
     default-preparation-time: 15
 
   menu:
-    cache-ttl-seconds: 3600
+    cache-ttl-seconds: ${MENU_CACHE_TTL_SECONDS:3600}
     max-items-per-category: 50
 
   billing:
@@ -67,9 +67,9 @@ app:
 
 # Server Configuration
 server:
-  port: 8082
+  port: ${SERVER_PORT:8082}
   servlet:
-    context-path: /domain2
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:/domain2}
   forward-headers-strategy: framework
   compression:
     enabled: true
