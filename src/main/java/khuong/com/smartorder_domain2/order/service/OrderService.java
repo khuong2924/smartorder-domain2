@@ -1,4 +1,3 @@
-// src/main/java/khuong/com/smartorderbeorderdomain/order/service/OrderService.java
 package khuong.com.smartorder_domain2.order.service;
 
 import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
@@ -10,13 +9,13 @@ import khuong.com.smartorder_domain2.order.enums.OrderItemStatus;
 import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.repository.OrderItemRepository;
 import khuong.com.smartorder_domain2.order.repository.OrderRepository;
+import khuong.com.smartorder_domain2.security.TokenExtractor;
 import khuong.com.smartorder_domain2.table.entity.Table;
 import khuong.com.smartorder_domain2.table.enums.TableStatus;
 import khuong.com.smartorder_domain2.table.repository.TableRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import khuong.com.smartorder_domain2.order.dto.request.CreateOrderRequest;
@@ -39,11 +38,14 @@ public class OrderService {
     @Autowired
     private final OrderItemRepository orderItemRepository;
     private final MenuItemService menuItemService;
-    private final WebSocketService webSocketService;
+
     @Autowired
     private final TableRepository tableRepository;
+
+    @Autowired
+    private TokenExtractor tokenExtractor;
     
-    public OrderResponse createOrder(CreateOrderRequest request) {
+    public OrderResponse createOrder(CreateOrderRequest request, String authHeader) {
         Order order = new Order();
         
         // Find table by id and update its status
@@ -59,11 +61,13 @@ public class OrderService {
         tableRepository.save(table);
         
         order.setTable(table);
-        String waiterId = "1";
-        // String waiterId = getLoggedInUserId();
-        // if (waiterId == null) {
-        //     throw new IllegalArgumentException("User is not logged in");
-        // }
+        
+        // Lấy ID người dùng từ token
+        String waiterId = tokenExtractor.extractUserId(authHeader);
+        if (waiterId == null) {
+            throw new IllegalStateException("Người dùng chưa xác thực");
+        }
+        
         order.setWaiterId(waiterId);
         order.setStatus(OrderStatus.PENDING);
         order.setNote(request.getNote());
@@ -76,7 +80,7 @@ public class OrderService {
         order.setTotalAmount(calculateTotalAmount(items));
 
         Order savedOrder = orderRepository.save(order);
-        webSocketService.notifyKitchen(savedOrder);
+        // webSocketService.notifyKitchen(savedOrder);
 
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -99,7 +103,7 @@ public class OrderService {
         order.setStatus(newStatus);
 
         Order updatedOrder = orderRepository.save(order);
-        webSocketService.notifyOrderStatusChange(updatedOrder);
+        // webSocketService.notifyOrderStatusChange(updatedOrder);
 
         return OrderResponse.fromEntity(updatedOrder);
     }
@@ -162,7 +166,7 @@ public class OrderService {
         
         if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CANCELLED) {
             Table table = order.getTable();
-            table.setStatus(TableStatus.CLEANING);
+            table.setStatus(TableStatus.AVAILABLE);
             tableRepository.save(table);
         } else {
             throw new InvalidOrderStatusException("Order must be completed or cancelled to close the table");

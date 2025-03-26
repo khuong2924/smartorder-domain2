@@ -1,4 +1,3 @@
-
 package khuong.com.smartorder_domain2.order.controller;
 
 import khuong.com.smartorder_domain2.order.dto.request.CreateOrderRequest;
@@ -18,8 +17,10 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
-        OrderResponse orderResponse = orderService.createOrder(request);
+    public ResponseEntity<OrderResponse> createOrder(
+            @RequestBody CreateOrderRequest request,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        OrderResponse orderResponse = orderService.createOrder(request, authHeader);
         return ResponseEntity.ok(orderResponse);
     }
 

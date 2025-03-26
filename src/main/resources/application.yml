@@ -45,9 +45,25 @@ spring:
       - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 
 # JWT Configuration
-jwt:
-  secret: rSp/kisYeCdda6X8j0HA6jYCcpevXe6LQe3wHTPTC7GP5bQ5gqN15cLkAhtVomGpmT08rSqoyiD1wRxFOGhg8A==
-  expiration: 86400000
+# Sửa từ jwt.secret thành app.jwt.secret cho phù hợp với mã Java
+app:
+  jwt:
+    secret: rSp/kisYeCdda6X8j0HA6jYCcpevXe6LQe3wHTPTC7GP5bQ5gqN15cLkAhtVomGpmT08rSqoyiD1wRxFOGhg8A==
+    expiration: 86400000
+    
+  # Các thuộc tính ứng dụng khác
+  order:
+    max-items-per-order: 100
+    auto-cancel-after-minutes: 30
+    default-preparation-time: 15
+
+  menu:
+    cache-ttl-seconds: 3600
+    max-items-per-category: 50
+
+  billing:
+    tax-rate: 0.1
+    service-charge-rate: 0.05
 
 # Server Configuration
 server:
@@ -80,19 +96,4 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-
-# Custom Application Properties
-app:
-  order:
-    max-items-per-order: 100
-    auto-cancel-after-minutes: 30
-    default-preparation-time: 15
-
-  menu:
-    cache-ttl-seconds: 3600
-    max-items-per-category: 50
-
-  billing:
-    tax-rate: 0.1
-    service-charge-rate: 0.05
 

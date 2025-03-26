@@ -7,6 +7,7 @@ import khuong.com.smartorder_domain2.menu.dto.exception.DuplicateResourceExcepti
 import khuong.com.smartorder_domain2.menu.dto.exception.ResourceNotFoundException;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateMenuItemRequest;
+import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemWithUrlRequest;
 import khuong.com.smartorder_domain2.menu.dto.response.MenuItemResponse;
 import khuong.com.smartorder_domain2.menu.entity.Category;
 import khuong.com.smartorder_domain2.menu.entity.MenuItem;
@@ -182,6 +183,31 @@ public class MenuItemService {
         } else {
             menuItem.setImageUrl("https://www.svgrepo.com/show/508699/landscape-placeholder.svg");
         }
+
+        menuItem = menuItemRepository.save(menuItem);
+        priceHistoryService.saveInitialPrice(menuItem);
+
+        return MenuItemResponse.fromEntity(menuItem);
+    }
+
+    @Transactional
+    public MenuItemResponse createMenuItemWithUrl(CreateMenuItemWithUrlRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        validateMenuItemName(request.getName(), request.getCategoryId());
+
+        MenuItem menuItem = MenuItem.builder()
+                .category(category)
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .preparationTime(request.getPreparationTime())
+                .imageUrl(request.getImageUrl() != null ? request.getImageUrl() : 
+                        "https://www.svgrepo.com/show/508699/landscape-placeholder.svg")
+                .available(true)
+                .active(true)
+                .build();
 
         menuItem = menuItemRepository.save(menuItem);
         priceHistoryService.saveInitialPrice(menuItem);

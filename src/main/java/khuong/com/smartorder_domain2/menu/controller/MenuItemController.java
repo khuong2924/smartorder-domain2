@@ -7,6 +7,7 @@ import
         org.springframework.data.domain.Pageable;
 import jakarta.validation.Valid;
 import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemRequest;
+import khuong.com.smartorder_domain2.menu.dto.request.CreateMenuItemWithUrlRequest;
 import khuong.com.smartorder_domain2.menu.dto.request.UpdateMenuItemRequest;
 import khuong.com.smartorder_domain2.menu.dto.response.MenuItemResponse;
 import khuong.com.smartorder_domain2.menu.service.MenuItemService;
@@ -63,6 +64,12 @@ public class MenuItemController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PostMapping("/with-url")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<MenuItemResponse> createMenuItemWithUrl(
+            @Valid @RequestBody CreateMenuItemWithUrlRequest request) {
+        return ResponseEntity.ok(menuItemService.createMenuItemWithUrl(request));
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<MenuItemResponse> updateMenuItem(
