@@ -56,50 +56,30 @@ public class TableService {
                 .collect(Collectors.toList());
     }
     
-    @Transactional
-    public TableResponse updateTable(Long id, UpdateTableRequest request) {
-        Table table = findTableById(id);
-        
-        if (request.getTableNumber() != null && !request.getTableNumber().equals(table.getTableNumber())) {
-            if (tableRepository.existsByTableNumber(request.getTableNumber())) {
-                throw new DuplicateResourceException("Bàn với mã " + request.getTableNumber() + " đã tồn tại");
-            }
-            table.setTableNumber(request.getTableNumber());
-        }
-        
-        if (request.getNotes() != null) {
-            table.setNotes(request.getNotes());
-        }
-        
-        if (request.getCapacity() != null) {
-            table.setCapacity(request.getCapacity());
-        }
-        
-        if (request.getStatus() != null) {
-            table.setStatus(request.getStatus());
-        }
-        
-        if (request.getActive() != null) {
-            table.setActive(request.getActive());
-        }
-        
-        table = tableRepository.save(table);
-        return TableResponse.fromEntity(table);
-    }
-    
-    @Transactional
-    public TableResponse changeTableStatus(Long id, TableStatus status) {
-        Table table = findTableById(id);
-        table.setStatus(status);
-        table = tableRepository.save(table);
-        return TableResponse.fromEntity(table);
-    }
+
     
     @Transactional
     public void deleteTable(Long id) {
         Table table = findTableById(id);
         table.setActive(false);
         tableRepository.save(table);
+    }
+    
+    @Transactional
+    public void hardDeleteTable(Long id) {
+        Table table = findTableById(id);
+        tableRepository.delete(table);
+    }
+    
+    
+    
+    @Transactional
+    public void bulkUpdateStatus(List<Long> ids, TableStatus status) {
+        ids.forEach(id -> {
+            Table table = findTableById(id);
+            table.setStatus(status);
+            tableRepository.save(table);
+        });
     }
     
     private Table findTableById(Long id) {

@@ -39,19 +39,20 @@ public class TableController {
         return ResponseEntity.ok(tableService.getAvailableTables());
     }
     
-    @PutMapping("/{id}")
-    public ResponseEntity<TableResponse> updateTable(@PathVariable Long id, @Valid @RequestBody UpdateTableRequest request) {
-        return ResponseEntity.ok(tableService.updateTable(id, request));
-    }
+
     
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<TableResponse> changeTableStatus(@PathVariable Long id, @RequestParam TableStatus status) {
-        return ResponseEntity.ok(tableService.changeTableStatus(id, status));
-    }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTable(@PathVariable Long id) {
         tableService.deleteTable(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+    @PatchMapping("/bulk-status")
+    public ResponseEntity<Void> bulkUpdateStatus(@RequestBody List<Long> ids, @RequestParam TableStatus status) {
+        tableService.bulkUpdateStatus(ids, status);
         return ResponseEntity.noContent().build();
     }
 }
