@@ -11,9 +11,12 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
+
+    Optional<MenuItem> findById(Long id);
 
     Page<MenuItem> findByActiveAndAvailable(boolean active, boolean available, Pageable pageable);
 
@@ -44,4 +47,6 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     @Modifying
     @Query("UPDATE MenuItem m SET m.price = :newPrice WHERE m.id = :id")
     void updatePrice(@Param("id") Long id, @Param("newPrice") BigDecimal newPrice);
+
+
 }

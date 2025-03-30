@@ -1,58 +1,177 @@
 package khuong.com.smartorder_domain2.order.service;
 
+import khuong.com.smartorder_domain2.menu.repository.MenuItemRepository;
 import khuong.com.smartorder_domain2.order.entity.Cart;
 import khuong.com.smartorder_domain2.order.entity.CartItem;
+import khuong.com.smartorder_domain2.order.entity.Order;
+import khuong.com.smartorder_domain2.order.entity.OrderItem;
+import khuong.com.smartorder_domain2.order.enums.OrderItemStatus;
+import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.repository.CartRepository;
+import khuong.com.smartorder_domain2.order.repository.OrderRepository;
+import khuong.com.smartorder_domain2.table.entity.Table;
+import khuong.com.smartorder_domain2.table.enums.TableStatus;
+import khuong.com.smartorder_domain2.table.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CartService {
     @Autowired
-    private CartRepository cartRepository;
-
-    public Cart createCart(String tableNumber) {
-        Cart cart = new Cart();
-        cart.setTableNumber(tableNumber);
-        cart.setSubtotal(BigDecimal.ZERO);
-        return cartRepository.save(cart);
-    }
+    private final CartRepository cartRepository;
+    
+    @Autowired
+    private final OrderRepository orderRepository;
+    
+    @Autowired
+    private final MenuItemRepository menuItemRepository;
+    
+    @Autowired
+    private final TableRepository tableRepository;
 
     public Cart getCartById(Long id) {
         return cartRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + id));
+    }
+
+    public List<Cart> getAllCarts() {
+        return cartRepository.findAll();
+    }
+
+    public Cart createCart(Cart cart) {
+        return cartRepository.save(cart);
     }
 
     public Cart addItemToCart(Long cartId, CartItem item) {
         Cart cart = getCartById(cartId);
+        
+        // Kiểm tra sự tồn tại và tính khả dụng của món ăn
+        var menuItem = menuItemRepository.findById(item.getMenuItemId())
+                .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + item.getMenuItemId()));
+        
+        if (!menuItem.isAvailable()) {
+            throw new RuntimeException("Menu item is not available: " + menuItem.getName());
+        }
+        
+        // Đảm bảo giá trong CartItem phản ánh đúng giá hiện tại của MenuItem
+        item.setUnitPrice(menuItem.getPrice());
         item.setCart(cart);
-        cart.getItems().add(item);
-        updateCartSubtotal(cart);
+        
+        // Kiểm tra xem món này đã có trong giỏ hàng chưa
+        boolean itemExists = false;
+        for (CartItem existingItem : cart.getItems()) {
+            if (existingItem.getMenuItemId().equals(item.getMenuItemId())) {
+                // Nếu đã có, tăng số lượng
+                existingItem.setQuantity(existingItem.getQuantity() + item.getQuantity());
+                itemExists = true;
+                break;
+            }
+        }
+        
+        // Nếu chưa có, thêm mới
+        if (!itemExists) {
+            if (cart.getItems() == null) {
+                cart.setItems(new ArrayList<>());
+            }
+            cart.getItems().add(item);
+        }
+        
+        // Cập nhật tổng tiền
+        updateCartTotal(cart);
+        
         return cartRepository.save(cart);
     }
 
-    public void removeItemFromCart(Long cartId, Long itemId) {
+    public Cart removeItemFromCart(Long cartId, Long itemId) {
         Cart cart = getCartById(cartId);
         cart.getItems().removeIf(item -> item.getId().equals(itemId));
-        updateCartSubtotal(cart);
-        cartRepository.save(cart);
+        
+        // Cập nhật tổng tiền
+        updateCartTotal(cart);
+        
+        return cartRepository.save(cart);
     }
 
-    public void clearCart(Long cartId) {
+    private void updateCartTotal(Cart cart) {
+        BigDecimal total = BigDecimal.ZERO;
+        if (cart.getItems() != null) {
+            for (CartItem item : cart.getItems()) {
+                total = total.add(item.getUnitPrice().multiply(new BigDecimal(item.getQuantity())));
+            }
+        }
+        cart.setTotalAmount(total);
+    }
+
+    @Transactional
+    public Order checkoutCart(Long cartId, Long tableId, String waiterId) {
         Cart cart = getCartById(cartId);
-        cart.getItems().clear();
-        cart.setSubtotal(BigDecimal.ZERO);
-        cartRepository.save(cart);
+        
+        if (cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new RuntimeException("Cannot checkout an empty cart");
+        }
+        
+        // Tìm bàn và cập nhật trạng thái
+        Table table = tableRepository.findById(tableId)
+                .orElseThrow(() -> new RuntimeException("Table not found with id: " + tableId));
+        
+        if (table.getStatus() != TableStatus.AVAILABLE) {
+            throw new RuntimeException("Table is not available");
+        }
+        
+        // Cập nhật trạng thái bàn thành OCCUPIED
+        table.setStatus(TableStatus.OCCUPIED);
+        tableRepository.save(table);
+        
+        // Tạo đơn hàng mới
+        Order order = new Order();
+        order.setTable(table);
+        order.setWaiterId(waiterId);
+        order.setStatus(OrderStatus.PENDING);
+        order.setTotalAmount(cart.getTotalAmount());
+        
+        // Chuyển đổi CartItem thành OrderItem
+        List<OrderItem> orderItems = cart.getItems().stream()
+                .map(cartItem -> convertToOrderItem(cartItem, order))
+                .collect(Collectors.toList());
+        
+        order.setItems(orderItems);
+        
+        // Lưu đơn hàng
+        Order savedOrder = orderRepository.save(order);
+        
+        // Xóa giỏ hàng sau khi đã chuyển đổi thành công
+        cartRepository.delete(cart);
+        
+        return savedOrder;
     }
-
-    private void updateCartSubtotal(Cart cart) {
-        BigDecimal subtotal = cart.getItems().stream()
-                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        cart.setSubtotal(subtotal);
+    
+    private OrderItem convertToOrderItem(CartItem cartItem, Order order) {
+        // Kiểm tra lại sự tồn tại và tính khả dụng của món ăn tại thời điểm chuyển đổi
+        var menuItem = menuItemRepository.findById(cartItem.getMenuItemId())
+                .orElseThrow(() -> new RuntimeException("Menu item not found with id: " + cartItem.getMenuItemId()));
+        
+        if (!menuItem.isAvailable()) {
+            throw new RuntimeException("Menu item is no longer available: " + menuItem.getName());
+        }
+        
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(order);
+        orderItem.setMenuItem(menuItem);
+        orderItem.setQuantity(cartItem.getQuantity());
+        
+        // Sử dụng giá hiện tại từ MenuItem để đảm bảo tính cập nhật
+        orderItem.setUnitPrice(menuItem.getPrice());
+        orderItem.setStatus(OrderItemStatus.PENDING);
+        orderItem.setSpecialNotes(cartItem.getSpecialNotes());
+        
+        return orderItem;
     }
 }

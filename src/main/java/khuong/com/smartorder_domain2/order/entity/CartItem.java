@@ -18,7 +18,7 @@ public class CartItem {
     @ManyToOne
     private Cart cart;
 
-    private String menuItemId;
+    private Long menuItemId;
     private Integer quantity;
     private BigDecimal unitPrice;
     private String specialNotes;
