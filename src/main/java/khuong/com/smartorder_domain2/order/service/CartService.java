@@ -51,6 +51,7 @@ public class CartService {
         return carts;
     }
 
+    @Transactional
     public Cart createCart(CreateCartRequest request) {
         // Check if table exists and is available
         Table table = tableRepository.findById(request.getTableId())
@@ -69,6 +70,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public Cart addItemToCart(Long cartId, CartItem item) {
         Cart cart = getCartById(cartId);
         
@@ -84,6 +86,11 @@ public class CartService {
         item.setUnitPrice(menuItem.getPrice());
         item.setCart(cart);
         
+        // Khởi tạo danh sách items nếu chưa có
+        if (cart.getItems() == null) {
+            cart.setItems(new ArrayList<>());
+        }
+        
         // Kiểm tra xem món này đã có trong giỏ hàng chưa
         boolean itemExists = false;
         for (CartItem existingItem : cart.getItems()) {
@@ -95,12 +102,8 @@ public class CartService {
             }
         }
         
-        
         // Nếu chưa có, thêm mới
         if (!itemExists) {
-            if (cart.getItems() == null) {
-                cart.setItems(new ArrayList<>());
-            }
             cart.getItems().add(item);
         }
         
@@ -110,6 +113,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public Cart removeItemFromCart(Long cartId, Long itemId) {
         Cart cart = getCartById(cartId);
         cart.getItems().removeIf(item -> item.getId().equals(itemId));

@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "cart_items")
 @Getter
@@ -16,6 +18,8 @@ public class CartItem {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "cart_id")
+    @JsonBackReference
     private Cart cart;
 
     private Long menuItemId;
