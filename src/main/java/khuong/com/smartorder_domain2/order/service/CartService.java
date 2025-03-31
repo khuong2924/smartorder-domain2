@@ -38,13 +38,17 @@ public class CartService {
     @Autowired
     private final TableRepository tableRepository;
 
+    @Transactional(readOnly = true)
     public Cart getCartById(Long id) {
         return cartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cart not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
     public List<Cart> getAllCarts() {
-        return cartRepository.findAll();
+        List<Cart> carts = cartRepository.findAll();
+        carts.forEach(cart -> cart.getItems().size());
+        return carts;
     }
 
     public Cart createCart(CreateCartRequest request) {
