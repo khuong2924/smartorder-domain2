@@ -1,6 +1,7 @@
 package khuong.com.smartorder_domain2.order.service;
 
 import khuong.com.smartorder_domain2.menu.repository.MenuItemRepository;
+import khuong.com.smartorder_domain2.order.dto.request.CreateCartRequest;
 import khuong.com.smartorder_domain2.order.entity.Cart;
 import khuong.com.smartorder_domain2.order.entity.CartItem;
 import khuong.com.smartorder_domain2.order.entity.Order;
@@ -46,7 +47,21 @@ public class CartService {
         return cartRepository.findAll();
     }
 
-    public Cart createCart(Cart cart) {
+    public Cart createCart(CreateCartRequest request) {
+        // Check if table exists and is available
+        Table table = tableRepository.findById(request.getTableId())
+                .orElseThrow(() -> new RuntimeException("Table not found with id: " + request.getTableId()));
+        
+        if (table.getStatus() != TableStatus.AVAILABLE) {
+            throw new RuntimeException("Table is not available");
+        }
+        
+        // Create new cart
+        Cart cart = new Cart();
+        cart.setUserId(request.getUserId());
+        cart.setTotalAmount(BigDecimal.ZERO);
+        cart.setItems(new ArrayList<>());
+        
         return cartRepository.save(cart);
     }
 
@@ -75,6 +90,7 @@ public class CartService {
                 break;
             }
         }
+        
         
         // Nếu chưa có, thêm mới
         if (!itemExists) {

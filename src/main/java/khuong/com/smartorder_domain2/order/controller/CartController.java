@@ -2,6 +2,7 @@ package khuong.com.smartorder_domain2.order.controller;
 
 import khuong.com.smartorder_domain2.order.dto.request.CheckoutRequest;
 import khuong.com.smartorder_domain2.order.dto.response.OrderResponse;
+import khuong.com.smartorder_domain2.order.dto.request.CreateCartRequest;
 import khuong.com.smartorder_domain2.order.entity.Cart;
 import khuong.com.smartorder_domain2.order.entity.CartItem;
 import khuong.com.smartorder_domain2.order.entity.Order;
@@ -29,8 +30,8 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<Cart> createCart(@RequestBody Cart cart) {
-        return ResponseEntity.ok(cartService.createCart(cart));
+    public ResponseEntity<Cart> createCart(@RequestBody CreateCartRequest request) {
+        return ResponseEntity.ok(cartService.createCart(request));
     }
 
     @PostMapping("/{cartId}/items")
