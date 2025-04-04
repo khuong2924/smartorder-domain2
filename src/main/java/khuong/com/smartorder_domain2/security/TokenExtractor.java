@@ -1,14 +1,14 @@
 package khuong.com.smartorder_domain2.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor  // Use constructor injection
 public class TokenExtractor {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     public String extractUserId(String authHeader) {
         String token = extractTokenFromHeader(authHeader);

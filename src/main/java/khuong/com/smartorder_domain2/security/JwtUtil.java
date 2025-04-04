@@ -14,6 +14,11 @@ public class JwtUtil {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
     
+    // Add a default constructor to handle null injection
+    public JwtUtil() {
+        // Default constructor
+    }
+    
     public Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
