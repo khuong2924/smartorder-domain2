@@ -99,10 +99,15 @@ public class MenuItemService {
     }
 
     @Transactional
-    public void updateMenuItemAvailability(Long id, boolean available) {
-        MenuItem menuItem = findMenuItemById(id);
+    public void updateMenuItemAvailability(Long menuItemId, boolean available) {
+        MenuItem menuItem = menuItemRepository.findById(menuItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found: " + menuItemId));
+        
         menuItem.setAvailable(available);
         menuItemRepository.save(menuItem);
+        
+        log.info("Updated menu item {} availability to: {}", menuItem.getName(), available);
+        // You can add WebSocket notification here if needed
     }
 
     MenuItem findMenuItemById(Long id) {

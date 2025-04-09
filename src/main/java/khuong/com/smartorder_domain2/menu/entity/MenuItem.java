@@ -23,7 +23,7 @@ public class MenuItem implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    private Category category; 
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -48,8 +48,6 @@ public class MenuItem implements Serializable {
 
     @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<MenuItemOption> options;
-
-
 
     @CreatedDate
     @Column(name = "created_at")

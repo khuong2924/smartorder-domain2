@@ -15,7 +15,9 @@ import khuong.com.smartorder_domain2.table.enums.TableStatus;
 import khuong.com.smartorder_domain2.table.repository.TableRepository;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import khuong.com.smartorder_domain2.order.dto.request.CreateOrderRequest;
@@ -23,6 +25,7 @@ import khuong.com.smartorder_domain2.order.dto.request.OrderItemRequest;
 import khuong.com.smartorder_domain2.order.dto.response.OrderResponse;
 import khuong.com.smartorder_domain2.order.entity.Order;
 import khuong.com.smartorder_domain2.order.entity.OrderItem;
+import khuong.com.smartorder_domain2.order.service.OrderKitchenPublisher;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,7 +47,10 @@ public class OrderService {
 
     @Autowired
     private TokenExtractor tokenExtractor;
-    
+    @Autowired
+    @Qualifier("orderServiceKitchenPublisher")
+    private OrderKitchenPublisher orderKitchenPublisher;
+
     public OrderResponse createOrder(CreateOrderRequest request, String authHeader) {
         Order order = new Order();
         
@@ -80,7 +86,9 @@ public class OrderService {
         order.setTotalAmount(calculateTotalAmount(items));
 
         Order savedOrder = orderRepository.save(order);
-        // webSocketService.notifyKitchen(savedOrder);
+        
+        // Publish to kitchen
+        orderKitchenPublisher.publishOrderToKitchen(savedOrder, items);
 
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -170,6 +178,37 @@ public class OrderService {
             tableRepository.save(table);
         } else {
             throw new InvalidOrderStatusException("Order must be completed or cancelled to close the table");
+        }
+    }
+
+    @Transactional
+    public void updateOrderItemStatus(Long orderItemId, String status) {
+        OrderItem orderItem = orderItemRepository.findById(String.valueOf(orderItemId))
+                .orElseThrow(() -> new OrderNotFoundException("Order item not found: " + orderItemId));
+        
+        OrderItemStatus newStatus = OrderItemStatus.valueOf(status);
+        orderItem.setStatus(newStatus);
+        orderItemRepository.save(orderItem);
+        
+        // Check if all items are completed to update order status
+        Order order = orderItem.getOrder();
+        boolean allCompleted = order.getItems().stream()
+                .allMatch(item -> item.getStatus() == OrderItemStatus.READY);
+        
+        if (allCompleted && order.getStatus() != OrderStatus.COMPLETED) {
+            order.setStatus(OrderStatus.COMPLETED);
+            orderRepository.save(order);
+        }
+    }
+
+    private void updateOrderStatusIfNeeded(Order order) {
+        boolean allCompleted = order.getItems().stream()
+                .allMatch(item -> item.getStatus() == OrderItemStatus.READY);
+        
+        if (allCompleted && order.getStatus() == OrderStatus.PENDING) {
+            order.setStatus(OrderStatus.READY);
+            orderRepository.save(order);
+            // You can add WebSocket notification here if needed
         }
     }
 }

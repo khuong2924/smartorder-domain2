@@ -47,11 +47,15 @@ spring:
 # Kitchen RabbitMQ Configuration
 kitchen:
   queue:
-    orders: kitchen.orders.queue
+    orders: kitchen.order.queue
+    order-updates: order.status.updates.queue
+    menu-updates: menu.availability.updates.queue
   exchange:
-    orders: kitchen.orders.exchange
+    orders: restaurant.exchange
   routing-key:
-    orders: kitchen.orders.routing-key
+    orders: kitchen.orders
+    order-updates: kitchen.order.updates
+    menu-updates: kitchen.menu.updates
 
 # JWT Configuration
 # Sửa từ jwt.secret thành app.jwt.secret cho phù hợp với mã Java
