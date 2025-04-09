@@ -19,5 +19,7 @@ public interface TableRepository extends JpaRepository<Table, Long> {
     boolean existsByTableNumber(String tableNumber);
     void deleteByIdAndActiveTrue(Long id);
     List<Table> findByActiveFalse();
+
+    Optional<Table> findByTableNumber(String tableNumber);
   
 }

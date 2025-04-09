@@ -46,4 +46,9 @@ public class Order {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+    
+    @ManyToOne
+    @JoinColumn(name = "bill_id")
+    private Bill bill;
+    
 }
