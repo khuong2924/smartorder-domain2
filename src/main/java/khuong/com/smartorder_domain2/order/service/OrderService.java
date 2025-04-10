@@ -193,7 +193,7 @@ public class OrderService {
         // Check if all items are completed to update order status
         Order order = orderItem.getOrder();
         boolean allCompleted = order.getItems().stream()
-                .allMatch(item -> item.getStatus() == OrderItemStatus.READY);
+                .allMatch(item -> item.getStatus() == OrderItemStatus.COMPLETED);
         
         if (allCompleted && order.getStatus() != OrderStatus.COMPLETED) {
             order.setStatus(OrderStatus.COMPLETED);
@@ -203,7 +203,7 @@ public class OrderService {
 
     private void updateOrderStatusIfNeeded(Order order) {
         boolean allCompleted = order.getItems().stream()
-                .allMatch(item -> item.getStatus() == OrderItemStatus.READY);
+                .allMatch(item -> item.getStatus() == OrderItemStatus.COMPLETED);
         
         if (allCompleted && order.getStatus() == OrderStatus.PENDING) {
             order.setStatus(OrderStatus.READY);
