@@ -33,6 +33,7 @@ public class OrderKitchenPublisher {
         log.info("Published order {} to kitchen with {} items", order.getId(), newItems.size());
     }
 
+
     private OrderToKitchenDto createKitchenDto(Order order, List<OrderItem> items) {
         List<OrderToKitchenDto.KitchenItemDto> kitchenItems = items.stream()
                 .map(item -> OrderToKitchenDto.KitchenItemDto.builder()
