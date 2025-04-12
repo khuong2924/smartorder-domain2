@@ -1,7 +1,9 @@
 package khuong.com.smartorder_domain2.messaging;
 
 import khuong.com.smartorder_domain2.menu.service.MenuItemService;
+import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.service.OrderService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,6 +29,21 @@ public class KitchenUpdateListener {
         } catch (Exception e) {
             log.error("Error processing order item status update: {}", e.getMessage(), e);
             throw e;
+        }
+    }
+
+    @RabbitListener(queues = "${kitchen.queue.order-updates}")
+    public void handleOrderStatusUpdate(Map<String, Object> message) {
+        log.info("Received order status update: {}", message);
+        try {
+            String orderId = message.get("orderId").toString();
+            String status = message.get("status").toString();
+            
+            // Cập nhật trạng thái đơn hàng
+            orderService.updateOrderStatus(orderId, OrderStatus.valueOf(status));
+            log.info("Successfully updated order {} status to {}", orderId, status);
+        } catch (Exception e) {
+            log.error("Error processing order status update: {}", e.getMessage(), e);
         }
     }
 

@@ -3,9 +3,9 @@ package khuong.com.smartorder_domain2.order.enums;
 public enum OrderStatus {
     PENDING,
     CONFIRMED,
-    PREPARING,
+    IN_PROGRESS,
     READY,
-    SERVED,
+    DELIVERED,
     COMPLETED,
     CANCELLED
 }

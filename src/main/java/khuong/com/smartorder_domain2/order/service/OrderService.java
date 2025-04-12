@@ -137,22 +137,38 @@ public class OrderService {
     }
 
     private void validateStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
-        if (!isValidStatusTransition(currentStatus, newStatus)) {
-            throw new InvalidOrderStatusException(
-                    "Invalid status transition from " + currentStatus + " to " + newStatus
-            );
+        // Định nghĩa các chuyển đổi trạng thái hợp lệ
+        switch (currentStatus) {
+            case PENDING:
+                if (newStatus != OrderStatus.CONFIRMED && newStatus != OrderStatus.CANCELLED) {
+                    throw new IllegalStateException("Không thể chuyển từ PENDING sang " + newStatus);
+                }
+                break;
+            case CONFIRMED:
+                if (newStatus != OrderStatus.IN_PROGRESS && newStatus != OrderStatus.CANCELLED) {
+                    throw new IllegalStateException("Không thể chuyển từ CONFIRMED sang " + newStatus);
+                }
+                break;
+            case IN_PROGRESS:
+                if (newStatus != OrderStatus.READY && newStatus != OrderStatus.CANCELLED) {
+                    throw new IllegalStateException("Không thể chuyển từ IN_PROGRESS sang " + newStatus);
+                }
+                break;
+            case READY:
+                if (newStatus != OrderStatus.DELIVERED && newStatus != OrderStatus.CANCELLED) {
+                    throw new IllegalStateException("Không thể chuyển từ READY sang " + newStatus);
+                }
+                break;
+            case DELIVERED:
+                if (newStatus != OrderStatus.COMPLETED && newStatus != OrderStatus.CANCELLED) {
+                    throw new IllegalStateException("Không thể chuyển từ DELIVERED sang " + newStatus);
+                }
+                break;
+            case COMPLETED:
+                throw new IllegalStateException("Không thể thay đổi trạng thái của đơn hàng đã hoàn thành");
+            case CANCELLED:
+                throw new IllegalStateException("Không thể thay đổi trạng thái của đơn hàng đã hủy");
         }
-    }
-
-    private boolean isValidStatusTransition(OrderStatus currentStatus, OrderStatus newStatus) {
-        // Add validation logic for status transitions
-        if (currentStatus == OrderStatus.PENDING && newStatus == OrderStatus.CONFIRMED) {
-            return true;
-        }
-        if (currentStatus == OrderStatus.CONFIRMED && newStatus == OrderStatus.COMPLETED) {
-            return true;
-        }
-        return false;
     }
 
     public OrderResponse getOrderById(String orderId) {
@@ -190,25 +206,31 @@ public class OrderService {
         orderItem.setStatus(newStatus);
         orderItemRepository.save(orderItem);
         
-        // Check if all items are completed to update order status
+        // Cập nhật trạng thái đơn hàng nếu cần
         Order order = orderItem.getOrder();
-        boolean allCompleted = order.getItems().stream()
-                .allMatch(item -> item.getStatus() == OrderItemStatus.COMPLETED);
-        
-        if (allCompleted && order.getStatus() != OrderStatus.COMPLETED) {
-            order.setStatus(OrderStatus.COMPLETED);
-            orderRepository.save(order);
-        }
+        updateOrderStatusIfNeeded(order);
     }
 
     private void updateOrderStatusIfNeeded(Order order) {
         boolean allCompleted = order.getItems().stream()
                 .allMatch(item -> item.getStatus() == OrderItemStatus.COMPLETED);
         
-        if (allCompleted && order.getStatus() == OrderStatus.PENDING) {
-            order.setStatus(OrderStatus.READY);
-            orderRepository.save(order);
-            // You can add WebSocket notification here if needed
+        if (allCompleted) {
+            // Quy tắc chuyển đổi trạng thái khi tất cả món ăn hoàn thành
+            switch(order.getStatus()) {
+                case PENDING:
+                case CONFIRMED:
+                    // Nếu đang ở trạng thái PENDING hoặc CONFIRMED, chuyển sang READY
+                    order.setStatus(OrderStatus.READY);
+                    orderRepository.save(order);
+                    break;
+                case IN_PROGRESS:
+                    // Nếu đang ở trạng thái IN_PROGRESS, chuyển sang READY
+                    order.setStatus(OrderStatus.READY);
+                    orderRepository.save(order);
+                    break;
+                // Các trạng thái khác giữ nguyên
+            }
         }
     }
 }
