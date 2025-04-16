@@ -10,6 +10,7 @@ import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.repository.OrderItemRepository;
 import khuong.com.smartorder_domain2.order.repository.OrderRepository;
 import khuong.com.smartorder_domain2.security.TokenExtractor;
+import khuong.com.smartorder_domain2.service.PusherNotificationService;
 import khuong.com.smartorder_domain2.table.entity.Table;
 import khuong.com.smartorder_domain2.table.enums.TableStatus;
 import khuong.com.smartorder_domain2.table.repository.TableRepository;
@@ -26,6 +27,7 @@ import khuong.com.smartorder_domain2.order.dto.response.OrderResponse;
 import khuong.com.smartorder_domain2.order.entity.Order;
 import khuong.com.smartorder_domain2.order.entity.OrderItem;
 import khuong.com.smartorder_domain2.order.service.OrderKitchenPublisher;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,6 +52,8 @@ public class OrderService {
     @Autowired
     @Qualifier("orderServiceKitchenPublisher")
     private OrderKitchenPublisher orderKitchenPublisher;
+
+    private final PusherNotificationService pusherNotificationService;
 
     public OrderResponse createOrder(CreateOrderRequest request, String authHeader) {
         Order order = new Order();
@@ -93,16 +97,6 @@ public class OrderService {
         return OrderResponse.fromEntity(savedOrder);
     }
 
-    // private String getLoggedInUserId() {
-    //     String url = "http://localhost:8080/users/me";
-    //     ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-    //     if (response.getStatusCode().is2xxSuccessful()) {
-    //         // Assuming the response body contains the user ID
-    //         return response.getBody();
-    //     }
-    //     return null;
-    // }
-
     public OrderResponse updateOrderStatus(String orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
@@ -111,7 +105,9 @@ public class OrderService {
         order.setStatus(newStatus);
 
         Order updatedOrder = orderRepository.save(order);
-        // webSocketService.notifyOrderStatusChange(updatedOrder);
+        
+        // Add Pusher notification
+        pusherNotificationService.notifyOrderStatusUpdate(orderId, newStatus.name());
 
         return OrderResponse.fromEntity(updatedOrder);
     }
@@ -209,6 +205,9 @@ public class OrderService {
         // Cập nhật trạng thái đơn hàng nếu cần
         Order order = orderItem.getOrder();
         updateOrderStatusIfNeeded(order);
+        
+        // Add Pusher notification
+        pusherNotificationService.notifyOrderItemStatusUpdate(orderItemId, status);
     }
 
     private void updateOrderStatusIfNeeded(Order order) {

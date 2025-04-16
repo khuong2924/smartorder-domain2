@@ -3,6 +3,7 @@ package khuong.com.smartorder_domain2.messaging;
 import khuong.com.smartorder_domain2.menu.service.MenuItemService;
 import khuong.com.smartorder_domain2.order.enums.OrderStatus;
 import khuong.com.smartorder_domain2.order.service.OrderService;
+import khuong.com.smartorder_domain2.service.PusherNotificationService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class KitchenUpdateListener {
     private final OrderService orderService;
     private final MenuItemService menuItemService;
+    private final PusherNotificationService pusherNotificationService;
 
     @RabbitListener(queues = "${kitchen.queue.order-updates}")
     public void handleOrderItemStatusUpdate(Map<String, Object> message) {
@@ -25,6 +27,10 @@ public class KitchenUpdateListener {
             Long orderItemId = Long.valueOf(message.get("orderItemId").toString());
             String status = message.get("status").toString();
             orderService.updateOrderItemStatus(orderItemId, status);
+            
+            //  real-time notification 
+            pusherNotificationService.notifyOrderItemStatusUpdate(orderItemId, status);
+            
             log.info("Successfully updated order item {} status to {}", orderItemId, status);
         } catch (Exception e) {
             log.error("Error processing order item status update: {}", e.getMessage(), e);
@@ -39,8 +45,12 @@ public class KitchenUpdateListener {
             String orderId = message.get("orderId").toString();
             String status = message.get("status").toString();
             
-            // Cập nhật trạng thái đơn hàng
+            // Update order status
             orderService.updateOrderStatus(orderId, OrderStatus.valueOf(status));
+            
+            // Send real-time notification 
+            pusherNotificationService.notifyOrderStatusUpdate(orderId, status);
+            
             log.info("Successfully updated order {} status to {}", orderId, status);
         } catch (Exception e) {
             log.error("Error processing order status update: {}", e.getMessage(), e);
@@ -53,7 +63,13 @@ public class KitchenUpdateListener {
         try {
             Long menuItemId = Long.valueOf(message.get("menuItemId").toString());
             boolean available = (boolean) message.get("available");
+            String menuItemName = message.get("name") != null ? message.get("name").toString() : "Unknown Item";
+            
             menuItemService.updateMenuItemAvailability(menuItemId, available);
+            
+            // real-time notification 
+            pusherNotificationService.notifyMenuItemAvailabilityUpdate(menuItemId, available, menuItemName);
+            
             log.info("Successfully updated menu item {} availability to {}", menuItemId, available);
         } catch (Exception e) {
             log.error("Error processing menu item availability update: {}", e.getMessage(), e);

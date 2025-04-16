@@ -110,3 +110,10 @@ management:
     tags:
       application: ${spring.application.name}
 
+# Pusher Config
+pusher:
+  app-id: "1974464"
+  key: "499d51c77ae90ef82e7b"
+  secret: "f36cbaefa6774e2aaa69"
+  cluster: "ap1"
+
