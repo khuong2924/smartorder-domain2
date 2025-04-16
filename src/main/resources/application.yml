@@ -48,7 +48,7 @@ spring:
 kitchen:
   queue:
     orders: kitchen.order.queue
-    order-updates: order.status.updates.queue
+    order-updates: order.status.updates.queue 
     menu-updates: menu.availability.updates.queue
   exchange:
     orders: restaurant.exchange
@@ -58,7 +58,7 @@ kitchen:
     menu-updates: kitchen.menu.updates
 
 # JWT Configuration
-# Sửa từ jwt.secret thành app.jwt.secret cho phù hợp với mã Java
+
 app:
   jwt:
     secret: ${JWT_SECRET:Z8eVpDYwHm+/UFuzt+PZ3G1U43FTfLTYmgbZq2J5j0VL4nLrYz/tH1Wxht0aQNQmYL9CWxPfx2+p8aWRkPCXXw==}
